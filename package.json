@@ -1,0 +1,20 @@
+{
+  "name": "wiki-salt",
+  "version": "1.0.0",
+  "description": "MediaWiki wiki-salt script",
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@types/jquery": "^3.5.14",
+    "esbuild": "^0.14.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "esbuild src/index.ts --bundle --outdir=dist --legal-comments=inline --charset=utf8",
+    "watch": "esbuild src/index.ts --bundle --outdir=dist --legal-comments=inline --watch --charset=utf8"
+  },
+  "keywords": [
+    "wiki"
+  ],
+  "author": "salt-lovely",
+  "license": "MulanPSL-2.0"
+}
