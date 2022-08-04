@@ -4,8 +4,9 @@ const { log } = saltConsole
 
 let mwApi: mwApi
 export async function apiInit() {
+  log('正在初始化')
   await asyncGetMwApi()
-  await addPlugin()
+  addPlugin()
 }
 
 export function getMwApi() {
@@ -16,7 +17,7 @@ export function getMwApi() {
 async function asyncGetMwApi() {
   await waitMwApi() // 等待mw和mw.Api加载完毕
   mwApi = new mw.Api()
-  log('已获取mw.Api实例，可以开始工作...')
+  // log('已获取mw.Api实例，可以开始工作...')
 }
 /** 等待mw加载完毕 */
 async function waitMw() {
@@ -37,8 +38,7 @@ async function waitMwApi() {
 }
 
 /** 给mw.Api的原型添加方法——垫片代码来自官方文档 */
-async function addPlugin() {
-  await waitMwApi() // 等待mw和mw.Api加载完毕
+function addPlugin() {
   const mwApiInst = new mw.Api()
   if (typeof mwApiInst.postWithEditToken !== 'function') {
     log('mw.Api原型没有postWithEditToken方法，自动加载...')

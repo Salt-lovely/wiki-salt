@@ -2,14 +2,16 @@
  * @Author: Salt
  * @Date: 2022-07-09 13:46:28
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-04 21:00:17
+ * @LastEditTime: 2022-08-04 22:43:35
  * @Description: 入口文件
  * @FilePath: \wiki-salt\src\index.ts
  */
-
 import { init } from './init'
-
-init()
+import { model } from './model'
+;(async () => {
+  await init()
+  model()
+})()
 /*!
 Copyright (c) 2022 Salt-lovely
 wiki-salt is licensed under Mulan PSL v2.
@@ -28,6 +30,8 @@ See the Mulan PSL v2 for more details.
 // @author       Salt
 // @match        https://mcbbs-wiki.cn/index.php?*
 // @match        https://mcbbs-wiki.cn/wiki/*
+// @match        https://mcbbs.wiki/index.php?*
+// @match        https://mcbbs.wiki/wiki/*
 // @match        https://wiki.biligame.com/mcplayer/*
 // @grant        none
 // ==/UserScript==

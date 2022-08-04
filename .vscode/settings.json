@@ -3,6 +3,7 @@
         "basetimestamp",
         "createonly",
         "curtimestamp",
+        "editsection",
         "formatversion",
         "invalidtitle",
         "nocreate",
@@ -15,6 +16,8 @@
         "srwhat",
         "starttimestamp",
         "Userpage",
+        "Wikiplus",
+        "wikitext",
         "wordcount"
     ]
 }

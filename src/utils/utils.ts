@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-07-09 13:51:11
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-04 21:00:42
+ * @LastEditTime: 2022-08-04 22:26:54
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\utils.ts
  */
@@ -19,6 +19,28 @@ export function assert(condition: any, msg?: string): asserts condition {
     const errMsg = msg || '发生错误'
     throw new Error(errMsg)
   }
+}
+/** 当文档准备完毕时调用回调，若文档已经准备完毕，则马上调用回调 */
+export function docReady(fn: () => unknown): void {
+  if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', fn)
+  } else {
+    fn()
+  }
+}
+/** 当文档准备完毕时异步调用回调 */
+export async function docReadyAsync<T>(fn: () => T) {
+  const cb = new Promise<void>((res) => {
+    if (document.readyState === 'loading') {
+      window.addEventListener('DOMContentLoaded', () => {
+        res()
+      })
+    } else {
+      res()
+    }
+  })
+  await cb
+  return fn()
 }
 /**
  * 返回一个一定时间后解决的Promise，用于异步函数的休眠
