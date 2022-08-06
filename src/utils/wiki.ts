@@ -2,11 +2,13 @@
  * @Author: Salt
  * @Date: 2022-08-04 21:33:49
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-05 23:51:38
+ * @LastEditTime: 2022-08-06 20:53:36
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\wiki.ts
  */
+import { confirmModal } from 'Components/Modal'
 import WikiConstant from 'src/constant/wiki'
+import { getMwApi } from 'src/init/api'
 import { saltConsole } from './utils'
 
 type queryParams = { [key: string]: string | number | null | undefined }
@@ -102,4 +104,40 @@ export async function getWikiText(props: { section?: string; title: string }) {
     error('fail_to_get_wikitext', e)
     return '获取wikitext失败'
   }
+}
+/** 提交更改，若传入原始代码`originWikitext`将自动检查冲突问题 */
+export async function postEdit(props: {
+  section?: string
+  title: string
+  originWikitext?: string
+  wikitext: string
+  minor?: boolean
+  summary?: string
+}) {
+  const { title, section, originWikitext } = props
+  const mwApi = getMwApi()
+  if (originWikitext) {
+    // 对比一下最新版和旧版的区别
+    const currentWikitext = await getWikiText({ title, section })
+    if (currentWikitext !== originWikitext) {
+      const isConfirm = await confirmModal(
+        '发现编辑冲突，您编辑的版本与页面的当前版本不同，执意提交可能覆盖别人的编辑，您确定要继续吗？'
+      )
+      if (!isConfirm) return false
+    }
+  }
+  const { wikitext, summary, minor = false } = props
+  const res = await mwApi.postWithEditToken({
+    action: 'edit',
+    formatversion: '2',
+    assert: WikiConstant.userName ? 'user' : undefined,
+    nocreate: true,
+    title,
+    section,
+    text: wikitext,
+    minor,
+    summary: summary || '/* 维基盐编辑器 */',
+  })
+  console.log(res)
+  return res;
 }

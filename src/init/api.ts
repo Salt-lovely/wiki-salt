@@ -42,19 +42,24 @@ function addPlugin() {
   const mwApiInst = new mw.Api()
   if (typeof mwApiInst.postWithEditToken !== 'function') {
     log('mw.Api原型没有postWithEditToken方法，自动加载...')
-    mw.Api.prototype.postWithEditToken = function (p: any, a: any): any {
+    mw.Api.prototype.postWithEditToken = function (
+      this: mwApi,
+      p: any,
+      a: any
+    ): any {
       return this.postWithToken('csrf', p, a)
     }
   }
   if (typeof mwApiInst.getEditToken !== 'function') {
     log('mw.Api原型没有getEditToken方法，自动加载...')
-    mw.Api.prototype.getEditToken = function (): any {
+    mw.Api.prototype.getEditToken = function (this: mwApi): any {
       return this.getToken('csrf')
     }
   }
   if (typeof mwApiInst.create !== 'function') {
     log('mw.Api原型没有create方法，自动加载...')
     mw.Api.prototype.create = function (
+      this: mwApi,
       title: string,
       params: any,
       content: any
@@ -77,7 +82,11 @@ function addPlugin() {
   }
   if (typeof mwApiInst.edit !== 'function') {
     log('mw.Api原型没有edit方法，自动加载...')
-    mw.Api.prototype.edit = function (title: string, transform: any): any {
+    mw.Api.prototype.edit = function (
+      this: mwApi,
+      title: string,
+      transform: any
+    ): any {
       var basetimestamp: any,
         curtimestamp: any,
         api = this
@@ -137,6 +146,7 @@ function addPlugin() {
   if (typeof mwApiInst.newSection !== 'function') {
     log('mw.Api原型没有newSection方法，自动加载...')
     mw.Api.prototype.newSection = function (
+      this: mwApi,
       title: string,
       header: any,
       message: any,

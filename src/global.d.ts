@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-07-09 13:48:48
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-04 20:23:57
+ * @LastEditTime: 2022-08-06 18:50:18
  * @Description: 全局类型定义
  * @FilePath: \wiki-salt\src\global.d.ts
  */
@@ -26,7 +26,8 @@ interface mwConfig {
 }
 interface mwApi {
   abort()
-  postWithEditToken(params: any, additionalParams: any)
+  assertCurrentUser(query: any): any
+  postWithEditToken(params: any, additionalParams?: any)
   getEditToken()
   get(parameters: object, ajaxOptions?: object): JQueryPromise
   create(title: string, params: any, content: any)
