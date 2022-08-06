@@ -1,0 +1,14 @@
+@mixin btn($height: 32px, $minWidth: 32px, $fontSize: 24px) {
+  display: inline-block;
+  min-width: $minWidth;
+  height: $height;
+  line-height: $height;
+  border-radius: 4px;
+  font-size: $fontSize;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+  &:hover {
+    background-color: #9993;
+  }
+}

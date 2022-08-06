@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 21:33:49
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-05 00:35:54
+ * @LastEditTime: 2022-08-05 23:51:38
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\wiki.ts
  */
@@ -61,11 +61,12 @@ export const wikiHttp: apiHttp = {
     return res
   },
 }
-
+const parseFailedFallback = (pageTitle: string) =>
+  `<div>${pageTitle}解析失败</div>`
 export async function parseWikiText(props: {
   wikitext: string
   title?: string
-}) {
+}): Promise<string> {
   const { wikitext, title: pageTitle } = props
   const title = pageTitle ?? WikiConstant.currentPageName
   try {
@@ -77,11 +78,12 @@ export async function parseWikiText(props: {
       pst: 'true',
     })
     if (response.parse && response.parse.text) {
-      return response.parse.text['*']
+      return response.parse.text['*'] || ''
     }
+    return parseFailedFallback(title)
   } catch (e) {
-    error(`${pageTitle}解析失败`, e)
-    return `<div>${pageTitle}解析失败</div>`
+    error(`${title}页面解析失败`, e)
+    return parseFailedFallback(title)
   }
 }
 

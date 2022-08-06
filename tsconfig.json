@@ -32,6 +32,12 @@
       "Utils/*": [
         "src/utils/*"
       ],
+      "Components/*": [
+        "src/components/*"
+      ],
+      "Scss/*": [
+        "src/Scss/*"
+      ],
       "Model/*": [
         "src/model/*"
       ]

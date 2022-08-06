@@ -1,0 +1,6 @@
+.user-select-none {
+  &,
+  & * {
+    user-select: none !important;
+  }
+}

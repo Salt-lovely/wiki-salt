@@ -2,12 +2,13 @@
  * @Author: Salt
  * @Date: 2022-07-09 13:46:28
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-04 22:43:35
+ * @LastEditTime: 2022-08-06 14:49:36
  * @Description: 入口文件
  * @FilePath: \wiki-salt\src\index.ts
  */
 import { init } from './init'
 import { model } from './model'
+
 ;(async () => {
   await init()
   model()

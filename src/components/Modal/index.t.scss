@@ -1,0 +1,83 @@
+@import '../../scss/mixins.scss';
+.wiki-salt-modal {
+  display: relative;
+  max-width: 100vw;
+  max-height: 100vh;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-sizing: border-box;
+  overflow: hidden;
+  z-index: 999;
+  &.wiki-salt-modal-fix {
+    position: fixed;
+  }
+  &.wiki-salt-modal-abs {
+    position: absolute;
+  }
+  .wiki-salt-modal-title-container {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    margin: 0 16px;
+    border-bottom: 1px solid #6666;
+    cursor: all-scroll;
+    * {
+      cursor: auto;
+    }
+    .wiki-salt-modal-title {
+      height: 32px;
+      line-height: 32px;
+      font-size: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .wiki-salt-modal-title-close-btn {
+      @include btn($height: 32px);
+    }
+  }
+  .wiki-salt-modal-content-container {
+    position: absolute;
+    top: 56px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .wiki-salt-modal-drag-bar {
+    position: absolute;
+    display: block;
+    opacity: 0;
+    z-index: 999;
+    &-left {
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 8px;
+      cursor: w-resize;
+    }
+    &-right {
+      right: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 8px;
+      cursor: e-resize;
+    }
+    &-top {
+      top: 0;
+      left: 8px;
+      right: 8px;
+      height: 8px;
+      cursor: n-resize;
+    }
+    &-bottom {
+      bottom: 0;
+      left: 8px;
+      right: 8px;
+      height: 8px;
+      cursor: s-resize;
+    }
+  }
+}

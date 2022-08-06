@@ -1,47 +1,17 @@
-@mixin btn($height: 32px, $minWidth: 32px, $fontSize: 24px) {
-  display: inline-block;
-  min-width: $minWidth;
-  height: $height;
-  line-height: $height;
-  font-size: $fontSize;
-  text-align: center;
-  cursor: pointer;
-  user-select: none;
-}
+@import '../../scss/mixins.scss';
 
-#wiki-salt-edit-modal {
-  position: fixed;
-  top: 4rem;
-  bottom: 4rem;
-  left: 8rem;
-  right: 8rem;
+.wiki-salt-edit-modal {
   background-color: var(--bgcolor, #fbf2dc);
   background-clip: padding-box;
   border: 8px solid #6666;
-  border-radius: 8px;
-  z-index: 999;
-  &.hide {
-    display: none;
-  }
-  .wiki-salt-edit-modal-title {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px 0;
-    margin: 0 16px;
-    border-bottom: 1px solid #6666;
-    .wiki-salt-edit-modal-title-text {
-      height: 32px;
-      line-height: 32px;
-      font-size: 20px;
-      overflow: hidden;
-      white-space: nowrap;
-      text-overflow: ellipsis;
+  .wiki-salt-modal-content-container {
+    .wiki-salt-edit-modal-edit-textarea {
+      width: 100%;
+      min-height: 128px;
+      resize: vertical;
     }
-    .wiki-salt-edit-modal-title-close {
-      @include btn;
-      &:hover {
-        background-color: #6666;
-      }
+    .wiki-salt-edit-modal-btn {
+      @include btn($height: 24px, $fontSize: 16px);
     }
   }
 }
