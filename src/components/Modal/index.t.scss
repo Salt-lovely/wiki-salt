@@ -3,11 +3,11 @@
   display: relative;
   max-width: 100vw;
   max-height: 100vh;
-  background-color: #f0f0f0;
+  background-color: $bgColor;
   border-radius: 8px;
   box-sizing: border-box;
   overflow: hidden;
-  z-index: 999;
+  z-index: 99999998;
   &.wiki-salt-modal-fix {
     position: fixed;
   }
@@ -33,9 +33,10 @@
       text-overflow: ellipsis;
     }
     .wiki-salt-modal-title-close-btn {
-      @include btn($height: 32px);
+      @include btn($height: 32px, $fontSize: 16px);
     }
   }
+  // 主体内容
   .wiki-salt-modal-content-container {
     position: absolute;
     top: 56px;
@@ -44,6 +45,20 @@
     bottom: 8px;
     overflow-x: hidden;
     overflow-y: auto;
+    &-with-footer {
+      bottom: 32px;
+    }
+  }
+
+  .wiki-salt-modal-footer-container {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    height: 24px;
+    .wiki-salt-modal-footer-btn {
+      @include btn($height: 24px);
+    }
   }
 
   .wiki-salt-modal-drag-bar {

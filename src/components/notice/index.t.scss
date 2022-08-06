@@ -1,0 +1,80 @@
+@import '../../scss/mixins.scss';
+$generalMargin: 16px;
+#wiki-salt-notice {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 99999999;
+  .wiki-salt-notice-container {
+    display: flex;
+    position: absolute;
+    top: $generalMargin;
+    left: $generalMargin * 2;
+    right: $generalMargin * 2;
+    bottom: $generalMargin;
+    pointer-events: none;
+    .wiki-salt-notice {
+      min-width: 320px;
+      min-height: 84px;
+      padding: $generalMargin $generalMargin * 2;
+      margin-block-end: $generalMargin;
+      border-radius: 8px;
+      box-sizing: border-box;
+      background-color: $bgColorLight;
+      box-shadow: 1px 2px 5px 1px #9999;
+      pointer-events: auto;
+      .wiki-salt-notice-title {
+      }
+      .wiki-salt-notice-content {
+      }
+      // 消失特效
+      &.fade-out {
+      }
+    }
+    // 上
+    &.wiki-salt-notice-container-t {
+      flex-direction: column;
+      align-items: center;
+    }
+    // 右上
+    &.wiki-salt-notice-container-tr {
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    // 右
+    &.wiki-salt-notice-container-r {
+      flex-direction: column-reverse;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    // 右下
+    &.wiki-salt-notice-container-br {
+      flex-direction: column-reverse;
+      align-items: flex-end;
+    }
+    // 下
+    &.wiki-salt-notice-container-b {
+      flex-direction: column-reverse;
+      align-items: center;
+    }
+    // 左下
+    &.wiki-salt-notice-container-bl {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+    }
+    // 左
+    &.wiki-salt-notice-container-l {
+      flex-direction: column-reverse;
+      align-items: flex-start;
+      justify-content: center;
+    }
+    // 左上
+    &.wiki-salt-notice-container-tl {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}

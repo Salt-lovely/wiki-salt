@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-06 12:54:10
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 15:04:10
+ * @LastEditTime: 2022-08-06 21:17:46
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\Modal\resize.ts
  */
@@ -30,9 +30,9 @@ export function resizeBind(props: {
   bottomBar?: HTMLElement
   callback?: (props: {
     top: number
-    bottom: number
     left: number
-    right: number
+    width: number
+    height: number
   }) => unknown
 }) {
   let origin: OriginStatus = { x: 0, y: 0, top: 0, left: 0, w: 0, h: 0 }
@@ -83,7 +83,13 @@ export function resizeBind(props: {
     container.classList.remove('user-select-none')
     window.removeEventListener('mousemove', moveMove)
     if (callback) {
-      // TODO
+      const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = container
+      callback({
+        top: offsetTop,
+        left: offsetLeft,
+        width: offsetWidth,
+        height: offsetHeight,
+      })
     }
   }
   if (dragBar) {
@@ -148,7 +154,6 @@ function bindRight(props: {
   let calcWidth = w + x - ox
   // 宽度不得小于屏幕宽度的20%
   if (calcWidth < window.innerWidth * 0.2) calcWidth = window.innerWidth * 0.2
-  console.log('ox', ox, 'x', x, 'ow', w, 'w', calcWidth)
   container.style.width = `${calcWidth}px`
 }
 function bindTop(props: {
