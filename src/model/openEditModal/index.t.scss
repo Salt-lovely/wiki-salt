@@ -1,17 +1,51 @@
 @import '../../scss/mixins.scss';
 
 .wiki-salt-edit-modal {
-  background-color: var(--bgcolor, #fbf2dc);
   background-clip: padding-box;
   border: 8px solid #6666;
   .wiki-salt-modal-content-container {
-    .wiki-salt-edit-modal-edit-textarea {
-      width: 100%;
-      min-height: 128px;
-      resize: vertical;
+    display: flex;
+    // 上下排布
+    &.vertical {
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
     }
+    // 左右排布
+    &.horizon {
+      flex-direction: row;
+      justify-content: space-between;
+      .wiki-salt-edit-modal-edit-panel {
+        position: sticky;
+        top: 0;
+        height: 100%;
+        width: var(--textareaWidth, 50%);
+        padding-right: 8px;
+        .wiki-salt-edit-modal-edit-textarea {
+          height: 100%;
+          resize: none;
+        }
+      }
+      .wiki-salt-edit-modal-preview-panel {
+        width: var(--previewWidth, 50%);
+      }
+    }
+    .wiki-salt-edit-modal-edit-panel {
+      .wiki-salt-edit-modal-edit-textarea {
+        width: 100%;
+        min-height: 240px;
+        resize: vertical;
+      }
+    }
+    .wiki-salt-edit-modal-preview-panel {
+      .wiki-salt-edit-modal-preview-content {
+        padding: 8px 8px 4px;
+        border: 1px dashed #6666;
+      }
+    }
+
     .wiki-salt-edit-modal-btn {
-      @include btn($height: 24px, $fontSize: 16px);
+      @include btn($height: 24px, $minWidth: 48px, $fontSize: 16px);
     }
   }
 }

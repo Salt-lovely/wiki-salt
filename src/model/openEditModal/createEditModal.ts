@@ -2,14 +2,15 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 12:48:39
+ * @LastEditTime: 2022-08-06 21:11:23
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
 import { createModal } from 'Components/Modal'
+import { info } from 'Components/notice'
 import h from 'Utils/h'
 import { saltConsole } from 'Utils/utils'
-import { getWikiText, parseWikiText } from 'Utils/wiki'
+import { getWikiText, parseWikiText, postEdit } from 'Utils/wiki'
 
 const { log } = saltConsole
 
@@ -25,9 +26,19 @@ export default async function createEditModal(props: {
     modalTitleContainer,
     modalTitle,
     modalContentContainer,
+    closeModal,
   } = createModal({
     className: 'wiki-salt-edit-modal',
     titleContainerClassName: 'wiki-salt-edit-modal-title',
+    resizeCallback: ({ width }) => {
+      if (width > 960) {
+        modalContentContainer.classList.remove('vertical')
+        modalContentContainer.classList.add('horizon')
+      } else {
+        modalContentContainer.classList.add('vertical')
+        modalContentContainer.classList.remove('horizon')
+      }
+    },
   })
   // 编辑框
   /** 编辑后的wikitext */
@@ -59,9 +70,37 @@ export default async function createEditModal(props: {
     'div',
     {
       className: 'wiki-salt-edit-modal-btn wiki-salt-edit-modal-preview-btn',
-      onclick: () => parseTxt(editTxt),
+      onclick: async () => {
+        const startTime = Date.now()
+        const res = await parseTxt(editTxt)
+        if (res !== false) {
+          info(`获取预览成功，耗时${Date.now() - startTime}ms`)
+        } else {
+          info(`获取预览失败，耗时${Date.now() - startTime}ms`)
+        }
+      },
     },
     '预览'
+  )
+  const submitBtn = h(
+    'div',
+    {
+      className: 'wiki-salt-edit-modal-btn wiki-salt-edit-modal-preview-btn',
+      onclick: async () => {
+        const startTime = Date.now()
+        const res = await postEdit({
+          title,
+          section,
+          wikitext: editTxt,
+          originWikitext: originTxt,
+        })
+        if (res !== false) {
+          closeModal()
+          info(`编辑提交成功，耗时${Date.now() - startTime}ms`)
+        }
+      },
+    },
+    '提交'
   )
   const previewPanel = h(
     'div',
@@ -69,9 +108,16 @@ export default async function createEditModal(props: {
     h(
       'div',
       { className: 'wiki-salt-edit-modal-preview-btn-group' },
-      previewBtn
+      previewBtn,
+      submitBtn
     ),
     previewContent
+  )
+  // 宽度控制
+  modalContentContainer.style.setProperty('--textareaWidth', `50%`)
+  modalContentContainer.style.setProperty('--previewWidth', `50%`)
+  modalContentContainer.classList.add(
+    modalContentContainer.offsetWidth > 960 ? 'horizon' : 'vertical'
   )
   // 模态框标题
   modalTitle.textContent = `编辑“${title}”页面${
