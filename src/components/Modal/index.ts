@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-06 10:34:15
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 22:52:45
+ * @LastEditTime: 2022-08-07 23:53:16
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\Modal\index.ts
  */
@@ -55,7 +55,8 @@ export function createModal(props: {
       if (res === false) return
     }
     unbindResize() // 移除移动模态框的相关事件
-    modalContainer.remove() // 移出模态框
+    modalContainer.classList.add('wiki-salt-fade-out')
+    setTimeout(() => modalContainer.remove(), 300) // 移除模态框
   }
   const closeBtn = closeButton
     ? h(
@@ -144,7 +145,7 @@ export function createModal(props: {
 const contentWithFooterClassName =
   'wiki-salt-modal-content-container wiki-salt-modal-content-container-with-footer'
 const centerModalClassName =
-  'wiki-salt-modal wiki-salt-modal-fix wiki-salt-modal-fix-center'
+  'wiki-salt-modal wiki-salt-fade-in wiki-salt-modal-fix wiki-salt-modal-fix-center'
 /** 点击确认弹框，确定返回`Promise<true>`，取消返回`Promise<false>` */
 export async function confirmModal(
   props:
@@ -226,7 +227,8 @@ export async function confirmModal(
   )
   const closeModal = () => {
     unbindResize()
-    modalContainer.remove()
+    modalContainer.classList.add('wiki-salt-fade-out')
+    setTimeout(() => modalContainer.remove(), 300) // 移除模态框
   }
   const unbindResize = resizeBind({
     container: modalContainer,

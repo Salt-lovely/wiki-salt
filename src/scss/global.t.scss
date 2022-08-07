@@ -12,6 +12,10 @@
 .wiki-salt-fade-out {
   animation: fade-out 300ms ease;
   opacity: 0;
+  &,
+  & * {
+    pointer-events: none;
+  }
 }
 
 @keyframes fade-in {
