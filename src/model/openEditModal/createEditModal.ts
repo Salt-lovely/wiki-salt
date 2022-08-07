@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 12:53:10
+ * @LastEditTime: 2022-08-07 18:34:27
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
@@ -70,7 +70,7 @@ export default async function createEditModal(props: {
   // 预览框
   const previewContent = h(
     'div',
-    { className: 'wiki-salt-edit-modal-preview-content' },
+    { className: 'wiki-salt-edit-modal-preview-content mw-body-content' },
     '正在加载...'
   )
   const previewBtn = h(

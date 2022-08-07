@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 21:33:49
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 11:22:53
+ * @LastEditTime: 2022-08-07 18:28:43
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\wiki.ts
  */
@@ -26,6 +26,12 @@ interface apiHttp {
   post(params: postParams, type?: 'raw'): Promise<Response>
 }
 
+const wsHeader = {
+  pragma: 'no-cache',
+  'cache-control': 'no-cache',
+  'Api-User-Agent': `wiki-salt/${WikiConstant.wikiId}`,
+}
+
 export const wikiHttp: apiHttp = {
   get: async (params: queryParams, type?: string) => {
     const requestUrl = new URL(WikiConstant.apiUrl)
@@ -35,9 +41,7 @@ export const wikiHttp: apiHttp = {
     const res = await fetch(requestUrl, {
       method: 'GET',
       credentials: 'same-origin',
-      headers: {
-        'Api-User-Agent': `wiki-salt/${WikiConstant.wikiId}`,
-      },
+      headers: wsHeader,
     })
     if (!type || type === 'json') return res.json()
     if (type === 'text') return res.text()
@@ -53,9 +57,7 @@ export const wikiHttp: apiHttp = {
       method: 'POST',
       body: data,
       credentials: 'same-origin',
-      headers: {
-        'Api-User-Agent': `wiki-salt/${WikiConstant.wikiId}`,
-      },
+      headers: wsHeader,
     })
     if (!type || type === 'json') return res.json()
     if (type === 'text') return res.text()
@@ -95,7 +97,11 @@ export async function getWikiText(props: { section?: string; title: string }) {
     const res = await await fetch(
       `//${location.host}${WikiConstant.scriptPath}/index.php?title=${title}${
         section ? `&section=${section}` : ''
-      }&action=raw`
+      }&action=raw`,
+      {
+        method: 'GET',
+        headers: wsHeader,
+      }
     )
     if (!res || Number(res.status) > 299) {
       throw new Error('失败代码' + res.status)
