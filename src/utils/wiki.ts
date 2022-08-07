@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 21:33:49
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 18:28:43
+ * @LastEditTime: 2022-08-07 22:59:25
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\wiki.ts
  */
@@ -26,12 +26,6 @@ interface apiHttp {
   post(params: postParams, type?: 'raw'): Promise<Response>
 }
 
-const wsHeader = {
-  pragma: 'no-cache',
-  'cache-control': 'no-cache',
-  'Api-User-Agent': `wiki-salt/${WikiConstant.wikiId}`,
-}
-
 export const wikiHttp: apiHttp = {
   get: async (params: queryParams, type?: string) => {
     const requestUrl = new URL(WikiConstant.apiUrl)
@@ -41,7 +35,7 @@ export const wikiHttp: apiHttp = {
     const res = await fetch(requestUrl, {
       method: 'GET',
       credentials: 'same-origin',
-      headers: wsHeader,
+      headers: WikiConstant.wikiSaltHeader,
     })
     if (!type || type === 'json') return res.json()
     if (type === 'text') return res.text()
@@ -57,7 +51,7 @@ export const wikiHttp: apiHttp = {
       method: 'POST',
       body: data,
       credentials: 'same-origin',
-      headers: wsHeader,
+      headers: WikiConstant.wikiSaltHeader,
     })
     if (!type || type === 'json') return res.json()
     if (type === 'text') return res.text()
@@ -100,7 +94,7 @@ export async function getWikiText(props: { section?: string; title: string }) {
       }&action=raw`,
       {
         method: 'GET',
-        headers: wsHeader,
+        headers: WikiConstant.wikiSaltHeader,
       }
     )
     if (!res || Number(res.status) > 299) {
@@ -145,12 +139,26 @@ export async function postEdit(props: {
     section,
     text: wikitext,
     minor,
-    summary:
-      summary ||
-      (section && sectionTitle
-        ? `编辑“${title}”的“${sectionTitle}”章节 // 维基盐编辑器`
-        : `编辑“${title}” // 维基盐编辑器`),
+    summary: summary || defaultSummary({ title, section, sectionTitle }),
   })
   console.log(res)
   return res
+}
+
+export function defaultSummary(props: {
+  section?: string
+  sectionTitle?: string
+  title?: string
+  isEditing?: boolean
+}) {
+  const { title, section, sectionTitle, isEditing = true } = props
+  if (!title) return '// 维基盐编辑器'
+  if (!section || !sectionTitle) {
+    return isEditing
+      ? `编辑“${title}” // 维基盐编辑器`
+      : `创建“${title}” // 维基盐编辑器`
+  }
+  return isEditing
+    ? `编辑“${title}”的“${sectionTitle}”章节 // 维基盐编辑器`
+    : `编辑“${title}”的“${sectionTitle}”章节 // 维基盐编辑器`
 }

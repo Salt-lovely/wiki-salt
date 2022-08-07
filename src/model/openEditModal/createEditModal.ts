@@ -2,11 +2,11 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 18:34:27
+ * @LastEditTime: 2022-08-07 22:02:18
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
-import { createModal } from 'Components/Modal'
+import { confirmModal, createModal } from 'Components/Modal'
 import { info } from 'Components/notice'
 import h from 'Utils/h'
 import { saltConsole } from 'Utils/utils'
@@ -99,6 +99,10 @@ export default async function createEditModal(props: {
       onclick: async () => {
         if (isSubmit || isLoading) return false
         isSubmit = true
+        if (!(await confirmModal('您确定要提交编辑吗？'))) {
+          isSubmit = false
+          return false
+        }
         submitBtn.textContent = '正在提交...'
         const startTime = Date.now()
         const res = await postEdit({

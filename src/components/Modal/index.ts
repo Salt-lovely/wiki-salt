@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-06 10:34:15
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 13:32:19
+ * @LastEditTime: 2022-08-07 22:52:45
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\Modal\index.ts
  */
@@ -140,6 +140,11 @@ export function createModal(props: {
     closeModal,
   }
 }
+
+const contentWithFooterClassName =
+  'wiki-salt-modal-content-container wiki-salt-modal-content-container-with-footer'
+const centerModalClassName =
+  'wiki-salt-modal wiki-salt-modal-fix wiki-salt-modal-fix-center'
 /** 点击确认弹框，确定返回`Promise<true>`，取消返回`Promise<false>` */
 export async function confirmModal(
   props:
@@ -166,10 +171,7 @@ export async function confirmModal(
       : props.content
   const modalContentContainer = h(
     'div',
-    {
-      className:
-        'wiki-salt-modal-content-container wiki-salt-modal-content-container-with-footer',
-    },
+    { className: contentWithFooterClassName },
     content
   )
   // 获取标题
@@ -195,6 +197,7 @@ export async function confirmModal(
         {
           className: 'wiki-salt-modal-footer-btn',
           onclick: () => {
+            closeModal()
             defer.res(false)
           },
         },
@@ -205,6 +208,7 @@ export async function confirmModal(
         {
           className: 'wiki-salt-modal-footer-btn btn-primary',
           onclick: () => {
+            closeModal()
             defer.res(true)
           },
         },
@@ -215,13 +219,19 @@ export async function confirmModal(
   // 渲染
   const modalContainer = h(
     'div',
-    {
-      className: `wiki-salt-modal wiki-salt-modal-fix`,
-    },
+    { className: centerModalClassName },
     modalTitleContainer,
     modalContentContainer,
     footer
   )
+  const closeModal = () => {
+    unbindResize()
+    modalContainer.remove()
+  }
+  const unbindResize = resizeBind({
+    container: modalContainer,
+    dragBar: modalContainer,
+  })
   document.body.appendChild(modalContainer)
   return defer.promise
 }
