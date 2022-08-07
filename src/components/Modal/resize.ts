@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-06 12:54:10
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 21:17:46
+ * @LastEditTime: 2022-08-07 00:49:52
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\Modal\resize.ts
  */
@@ -55,7 +55,6 @@ export function resizeBind(props: {
   const mouseDown = (ev: MouseEvent) => {
     const { x, y, target, currentTarget } = ev
     if (currentTarget !== window) return
-    container.classList.add('user-select-none')
     const { offsetTop, offsetLeft, offsetWidth, offsetHeight } = container
     origin = {
       x,
@@ -70,6 +69,7 @@ export function resizeBind(props: {
       [dragBar, leftBar, rightBar, topBar, bottomBar].includes(target)
     ) {
       window.addEventListener('mousemove', moveMove)
+      container.classList.add('user-select-none')
       if (target === dragBar) type = 'drag'
       else if (target === leftBar) type = 'left'
       else if (target === rightBar) type = 'right'

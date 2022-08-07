@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 20:33:47
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 21:48:52
+ * @LastEditTime: 2022-08-07 15:29:21
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\notice\index.ts
  */
@@ -52,14 +52,14 @@ function basicDialog(props: basicDialogProps) {
     title,
     content,
     time = 5000,
-    fadeTime = 300,
+    fadeTime = 2000,
     closeable = false,
     pos = 1,
   } = props
   const dialog = h(
     'div',
     {
-      className: `wiki-salt-notice ${className}`,
+      className: `wiki-salt-notice wiki-salt-fade-in ${className}`,
     },
     title ? h('div', { className: 'wiki-salt-notice-title' }, title) : null,
     content
@@ -82,6 +82,33 @@ export function info(
 ) {
   basicDialog({
     className: 'wiki-salt-notice-info',
+    title,
+    content,
+    time: timeout,
+  })
+}
+
+export function alarm(
+  content: string | HTMLElement,
+  title?: string | HTMLElement,
+  timeout = 5000
+) {
+  console.log(content)
+  basicDialog({
+    className: 'wiki-salt-notice-alarm',
+    title,
+    content,
+    time: timeout,
+  })
+}
+
+export function done(
+  content: string | HTMLElement,
+  title?: string | HTMLElement,
+  timeout = 5000
+) {
+  basicDialog({
+    className: 'wiki-salt-notice-done',
     title,
     content,
     time: timeout,

@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 21:11:23
+ * @LastEditTime: 2022-08-07 12:53:10
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
@@ -43,6 +43,12 @@ export default async function createEditModal(props: {
   // 编辑框
   /** 编辑后的wikitext */
   let editTxt = '正在加载...'
+  /** 正在加载 */
+  let isLoading = true
+  /** 正在解析 */
+  let isParsing = false
+  /** 正在提交 */
+  let isSubmit = false
   const editArea = h('textarea', {
     className: 'wiki-salt-edit-modal-edit-textarea',
     value: editTxt,
@@ -52,6 +58,7 @@ export default async function createEditModal(props: {
     onchange: () => {
       editTxt = editArea.value
     },
+    disabled: true,
   })
   const editPanel = h(
     'div',
@@ -71,12 +78,15 @@ export default async function createEditModal(props: {
     {
       className: 'wiki-salt-edit-modal-btn wiki-salt-edit-modal-preview-btn',
       onclick: async () => {
-        const startTime = Date.now()
-        const res = await parseTxt(editTxt)
+        if (isSubmit || isLoading) return false
+        previewBtn.textContent = '获取预览...'
+        // const startTime = Date.now()
+        const res = await parseTxt(editTxt, true)
+        previewBtn.textContent = '预览'
         if (res !== false) {
-          info(`获取预览成功，耗时${Date.now() - startTime}ms`)
+          // info(`获取预览成功，耗时${Date.now() - startTime}ms`)
         } else {
-          info(`获取预览失败，耗时${Date.now() - startTime}ms`)
+          info(`获取预览失败`)
         }
       },
     },
@@ -87,16 +97,25 @@ export default async function createEditModal(props: {
     {
       className: 'wiki-salt-edit-modal-btn wiki-salt-edit-modal-preview-btn',
       onclick: async () => {
+        if (isSubmit || isLoading) return false
+        isSubmit = true
+        submitBtn.textContent = '正在提交...'
         const startTime = Date.now()
         const res = await postEdit({
           title,
           section,
+          sectionTitle,
           wikitext: editTxt,
-          originWikitext: originTxt,
+          originWikitext: originTxt as string,
         })
         if (res !== false) {
-          closeModal()
-          info(`编辑提交成功，耗时${Date.now() - startTime}ms`)
+          info(`编辑提交成功，耗时${Date.now() - startTime}ms，将刷新页面`)
+          setTimeout(() => {
+            closeModal()
+            location.reload()
+          }, 2500)
+        } else {
+          info(`编辑提交失败`)
         }
       },
     },
@@ -127,11 +146,11 @@ export default async function createEditModal(props: {
   modalContentContainer.appendChild(editPanel)
   modalContentContainer.appendChild(previewPanel)
   // 简单逻辑
-  let isParsing = false
   let lastParseTime = 0
   let timer = 0
   /** 解析wikitext并放到previewContent上 */
   const parseTxt = async (wikitext: string, force?: boolean) => {
+    if (isSubmit) return false
     if (isParsing) {
       clearTimeout(timer)
       timer = setTimeout(() => parseTxt(wikitext), 500)
@@ -152,7 +171,13 @@ export default async function createEditModal(props: {
   }
   // 获取文字和解析后的值
   const originTxt = await getWikiText({ title, section })
+  if (originTxt === false) {
+    closeModal()
+    return
+  }
   editArea.value = originTxt
   editTxt = originTxt
-  parseTxt(originTxt)
+  await parseTxt(originTxt)
+  isLoading = false
+  editArea.disabled = false
 }

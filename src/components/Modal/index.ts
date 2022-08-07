@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-06 10:34:15
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 20:52:53
+ * @LastEditTime: 2022-08-07 13:32:19
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\Modal\index.ts
  */
@@ -97,7 +97,7 @@ export function createModal(props: {
   const modalContainer = h(
     'div',
     {
-      className: `wiki-salt-modal ${
+      className: `wiki-salt-modal wiki-salt-fade-in ${
         isFixed ? 'wiki-salt-modal-fix' : 'wiki-salt-modal-abs'
       } ${className}`,
     },

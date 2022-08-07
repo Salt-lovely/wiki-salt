@@ -2,11 +2,12 @@
  * @Author: Salt
  * @Date: 2022-08-04 21:33:49
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 20:53:36
+ * @LastEditTime: 2022-08-07 11:22:53
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\wiki.ts
  */
 import { confirmModal } from 'Components/Modal'
+import { alarm } from 'Components/notice'
 import WikiConstant from 'src/constant/wiki'
 import { getMwApi } from 'src/init/api'
 import { saltConsole } from './utils'
@@ -24,8 +25,6 @@ interface apiHttp {
   post(params: postParams, type?: 'text'): Promise<string>
   post(params: postParams, type?: 'raw'): Promise<Response>
 }
-
-const { error } = saltConsole
 
 export const wikiHttp: apiHttp = {
   get: async (params: queryParams, type?: string) => {
@@ -84,30 +83,34 @@ export async function parseWikiText(props: {
     }
     return parseFailedFallback(title)
   } catch (e) {
-    error(`${title}页面解析失败`, e)
+    saltConsole.error(`${title}页面解析失败`, e)
+    alarm(`${e}`, `${title}页面解析失败`)
     return parseFailedFallback(title)
   }
 }
-
+/** 获取某一页的源代码 */
 export async function getWikiText(props: { section?: string; title: string }) {
   const { title, section } = props
   try {
-    const response = await (
-      await fetch(
-        `//${location.host}${WikiConstant.scriptPath}/index.php?title=${title}${
-          section ? `&section=${section}` : ''
-        }&action=raw`
-      )
-    ).text()
-    return response
+    const res = await await fetch(
+      `//${location.host}${WikiConstant.scriptPath}/index.php?title=${title}${
+        section ? `&section=${section}` : ''
+      }&action=raw`
+    )
+    if (!res || Number(res.status) > 299) {
+      throw new Error('失败代码' + res.status)
+    }
+    return res.text()
   } catch (e) {
-    error('fail_to_get_wikitext', e)
-    return '获取wikitext失败'
+    saltConsole.error('获取源代码信息失败', e)
+    alarm(`${e}`, `${title}源代码获取失败`)
+    return false
   }
 }
 /** 提交更改，若传入原始代码`originWikitext`将自动检查冲突问题 */
 export async function postEdit(props: {
   section?: string
+  sectionTitle?: string
   title: string
   originWikitext?: string
   wikitext: string
@@ -126,7 +129,7 @@ export async function postEdit(props: {
       if (!isConfirm) return false
     }
   }
-  const { wikitext, summary, minor = false } = props
+  const { sectionTitle, wikitext, summary, minor = false } = props
   const res = await mwApi.postWithEditToken({
     action: 'edit',
     formatversion: '2',
@@ -136,8 +139,12 @@ export async function postEdit(props: {
     section,
     text: wikitext,
     minor,
-    summary: summary || '/* 维基盐编辑器 */',
+    summary:
+      summary ||
+      (section && sectionTitle
+        ? `编辑“${title}”的“${sectionTitle}”章节 // 维基盐编辑器`
+        : `编辑“${title}” // 维基盐编辑器`),
   })
   console.log(res)
-  return res;
+  return res
 }

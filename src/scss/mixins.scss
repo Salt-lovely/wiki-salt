@@ -12,5 +12,9 @@
     background-color: #9993;
   }
 }
+
 $bgColor: var(--bgcolor, var(--theme-background-color, #f9f9f9));
 $bgColorLight: var(--lightcolor, var(--theme-card-background-color, #fff));
+
+$fontSizeSmall: var(--font-size-small, 14px);
+$fontSize: var(--font-size, 16px);

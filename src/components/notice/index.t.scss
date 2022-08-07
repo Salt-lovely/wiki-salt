@@ -26,12 +26,13 @@ $generalMargin: 16px;
       background-color: $bgColorLight;
       box-shadow: 1px 2px 5px 1px #9999;
       pointer-events: auto;
+      animation: fade-in 300ms ease;
       .wiki-salt-notice-title {
+        font-size: $fontSizeSmall;
+        margin-block-end: $generalMargin * 0.75;
       }
       .wiki-salt-notice-content {
-      }
-      // 消失特效
-      &.fade-out {
+        font-size: $fontSize;
       }
     }
     // 上

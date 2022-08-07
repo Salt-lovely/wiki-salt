@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:30:26
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-05 00:10:21
+ * @LastEditTime: 2022-08-07 15:28:06
  * @Description: vector皮肤添加编辑按钮
  * @FilePath: \wiki-salt\src\model\addEditBtn\vector.ts
  */
@@ -29,7 +29,7 @@ export default function vector() {
           openEditModal()
         },
       },
-      '🧂编辑'
+      '盐编辑'
     )
   )
   if (topBtn) {
@@ -44,7 +44,9 @@ export default function vector() {
     document.body.querySelectorAll(sectionEditBtnQuery)
   ) as HTMLAnchorElement[]
   sections.forEach((el) => {
-    const section = (el.href.match(/section=([^&]+)/) || [])[1] || undefined
+    const href = decodeURIComponent(el.href)
+    const title = (href.match(/title=([^&]+)/) || [])[1]
+    const section = href.match(/section=([^&]+)/)?.[1]?.replace(/T-/gi, '')
     const sectionTitle =
       el.parentElement!.parentElement!.querySelector('.mw-headline')
         ?.textContent || ''
@@ -54,12 +56,13 @@ export default function vector() {
         title: sectionTitle,
         onclick: (ev) => {
           ev.preventDefault()
-          openEditModal({ section, sectionTitle })
+          openEditModal({ title, section, sectionTitle })
         },
       },
-      '🧂编辑'
+      '盐编辑'
     )
     const divider = h('span', { className: 'mw-editsection-divider' }, ' | ')
+    divider.style.display = 'inline'
     if (el.nextSibling) {
       const _ns = el.nextSibling
       el.parentElement!.insertBefore(divider, _ns)
