@@ -4,5 +4,6 @@
 **/*.gif
 **/*.jpg
 **/*.jpeg
+**/*.map
 package.json
 tsconfig.json

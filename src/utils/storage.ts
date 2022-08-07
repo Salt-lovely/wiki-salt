@@ -2,9 +2,9 @@
  * @Author: Salt
  * @Date: 2022-01-25 23:10:30
  * @LastEditors: Salt
- * @LastEditTime: 2022-01-30 13:17:53
+ * @LastEditTime: 2022-08-07 16:13:22
  * @Description: 这个文件的功能
- * @FilePath: \better-tieba\src\utils\storage.ts
+ * @FilePath: \wiki-salt\src\utils\storage.ts
  */
 
 function parse<T>(str: string | null): T | null {
@@ -31,7 +31,7 @@ export function write<T>(key: string, value: T): void {
   localStorage.setItem(key, JSON.stringify(value))
 }
 
-//! 下面这一段是从 https://gitee.com/moushu/ms-esbuild-react-scaffold/blob/master/src/utils/localStorage.ts 抄的
+// 下面这一段是从 https://gitee.com/moushu/ms-esbuild-react-scaffold/blob/master/src/utils/localStorage.ts 抄的
 
 function unsafeRead<T>(key: string): T | null {
   // if (!localStorage) throw new Error('"localStorage" is required');

@@ -1,18 +1,21 @@
 /*
- * @LastEditTime: 2022-08-04 23:27:04
+ * @LastEditTime: 2022-08-07 17:34:50
  * @Description: file content
  */
-const { build } = require('esbuild');
-const { sassPlugin, postcssModules } = require('esbuild-sass-plugin');
+const { build } = require('esbuild')
+const { sassPlugin, postcssModules } = require('esbuild-sass-plugin')
 
-const isCssModule = /\.mo?d?u?l?e?\.scss$/i;
-const isCssText = /\.te?x?t?\.scss$/i;
+const isCssModule = /\.mo?d?u?l?e?\.scss$/i
+const isCssText = /\.te?x?t?\.scss$/i
 
 const defaultBuildConfig = {
   entryPoints: ['src/index.ts'],
   bundle: true,
-  outfile: 'dist/bundle.js',
+  minify: false,
+  outfile: 'dist/index.js',
   target: 'es2017',
+  charset: 'utf8',
+  legalComments: 'eof',
   plugins: [
     sassPlugin({
       filter: isCssModule, // css 模块
@@ -25,7 +28,7 @@ const defaultBuildConfig = {
     }),
     sassPlugin({}),
   ],
-};
+}
 
 /**
  * @param {{
@@ -44,16 +47,15 @@ module.exports = async ({ props, define }) => {
       : {
           __DEV__: 'true',
           'process.env.NODE_ENV': '"development"',
-          'process.env.HISTORY': '"browser"',
           ...define,
-        };
+        }
   // 构建参数
   const buildProps = {
     ...defaultBuildConfig,
     define: $define,
     ...props,
-  };
-  return build(buildProps);
-};
+  }
+  return build(buildProps)
+}
 
-module.exports.defaultBuildConfig = defaultBuildConfig;
+module.exports.defaultBuildConfig = defaultBuildConfig

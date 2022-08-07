@@ -1,9 +1,7 @@
 /*
- * @LastEditTime: 2022-08-04 23:42:08
+ * @LastEditTime: 2022-08-07 17:34:54
  * @Description: 本地热更新服务
  */
-const port = 5000
-
 const path = require('path')
 const core = require('./tools/core')
 const $P = require('./tools/format-print')
@@ -28,12 +26,7 @@ console.log($P('MCBSSWiki widget - serve ' + $T(), 'grey'))
   }
   await core({
     props: {
-      outfile: 'dist/index.js',
-      sourcemap: true,
       watch: { onRebuild },
-    },
-    define: {
-      'process.env.HISTORY': '"hash"',
     },
   })
   console.log($P(' SERVE ', 'b', 'white', 'cyanbg'), '编译完成, 开启服务中')
