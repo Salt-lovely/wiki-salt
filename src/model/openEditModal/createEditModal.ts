@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 22:02:18
+ * @LastEditTime: 2022-08-07 23:06:15
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
@@ -10,7 +10,12 @@ import { confirmModal, createModal } from 'Components/Modal'
 import { info } from 'Components/notice'
 import h from 'Utils/h'
 import { saltConsole } from 'Utils/utils'
-import { getWikiText, parseWikiText, postEdit } from 'Utils/wiki'
+import {
+  defaultSummary,
+  getWikiText,
+  parseWikiText,
+  postEdit,
+} from 'Utils/wiki'
 
 const { log } = saltConsole
 
@@ -30,10 +35,14 @@ export default async function createEditModal(props: {
   } = createModal({
     className: 'wiki-salt-edit-modal',
     titleContainerClassName: 'wiki-salt-edit-modal-title',
-    resizeCallback: ({ width }) => {
+    resizeCallback: ({ width, height }) => {
       if (width > 960) {
         modalContentContainer.classList.remove('vertical')
         modalContentContainer.classList.add('horizon')
+        modalContentContainer.style.setProperty(
+          '--salt-wiki-editor-height',
+          `${height}px`
+        )
       } else {
         modalContentContainer.classList.add('vertical')
         modalContentContainer.classList.remove('horizon')
@@ -43,6 +52,8 @@ export default async function createEditModal(props: {
   // 编辑框
   /** 编辑后的wikitext */
   let editTxt = '正在加载...'
+  /** 编辑说明 */
+  let summary = defaultSummary({ title, section, sectionTitle })
   /** 正在加载 */
   let isLoading = true
   /** 正在解析 */
@@ -109,6 +120,7 @@ export default async function createEditModal(props: {
           title,
           section,
           sectionTitle,
+          summary,
           wikitext: editTxt,
           originWikitext: originTxt as string,
         })
@@ -125,6 +137,16 @@ export default async function createEditModal(props: {
     },
     '提交'
   )
+  const summaryInput = h('input', {
+    className: 'wiki-salt-edit-modal-summary-input',
+    value: summary,
+    oninput: () => {
+      summary = summaryInput.value
+    },
+    onchange: () => {
+      summary = summaryInput.value
+    },
+  })
   const previewPanel = h(
     'div',
     { className: 'wiki-salt-edit-modal-preview-panel' },
@@ -132,7 +154,8 @@ export default async function createEditModal(props: {
       'div',
       { className: 'wiki-salt-edit-modal-preview-btn-group' },
       previewBtn,
-      submitBtn
+      submitBtn,
+      summaryInput
     ),
     previewContent
   )
