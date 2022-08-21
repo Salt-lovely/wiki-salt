@@ -10,6 +10,7 @@
         "pagelist",
         "pagid",
         "rvprop",
+        "spcontent",
         "srlimit",
         "srnamespace",
         "srsearch",

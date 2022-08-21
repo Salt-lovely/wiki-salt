@@ -1,7 +1,7 @@
 /*
  * @Author: Wikiplus
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 23:01:41
+ * @LastEditTime: 2022-08-21 19:39:01
  * @Description: 使用了Wikiplus的src/utils/constants.js
  * @FilePath: \wiki-salt\src\constant\wiki.ts
  */
@@ -15,6 +15,10 @@ class WikiConstants {
   /** 页面名 */
   get currentPageName(): string {
     return getConfig<string>('wgPageName').replace(/ /g, '_')
+  }
+  /** 特殊页面名，是这个特殊页面的编码，不受跨语言的影响 */
+  get currentSpecialPageName(): string | null {
+    return getConfig<string | null>('wgCanonicalSpecialPageName')
   }
   get articleId() {
     return getConfig('wgArticleId')

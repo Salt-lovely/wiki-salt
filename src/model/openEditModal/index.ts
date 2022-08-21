@@ -2,13 +2,12 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:27:41
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 21:08:17
+ * @LastEditTime: 2022-08-21 19:36:12
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\index.ts
  */
 
 import WikiConstant from 'src/constant/wiki'
-import h from 'Utils/h'
 import { addStyle } from 'Utils/resource'
 import createEditModal from './createEditModal'
 import style from './index.t.scss'

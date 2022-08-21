@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 21:33:49
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 22:59:25
+ * @LastEditTime: 2022-08-21 20:18:58
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\wiki.ts
  */
@@ -117,11 +117,11 @@ export async function postEdit(props: {
   minor?: boolean
   summary?: string
 }) {
-  const { title, section, originWikitext } = props
+  const { title, section, wikitext, originWikitext } = props
   const mwApi = getMwApi()
+  const currentWikitext = await getWikiText({ title, section })
   if (originWikitext) {
     // 对比一下最新版和旧版的区别
-    const currentWikitext = await getWikiText({ title, section })
     if (currentWikitext !== originWikitext) {
       const isConfirm = await confirmModal(
         '发现编辑冲突，您编辑的版本与页面的当前版本不同，执意提交可能覆盖别人的编辑，您确定要继续吗？'
@@ -129,7 +129,14 @@ export async function postEdit(props: {
       if (!isConfirm) return false
     }
   }
-  const { sectionTitle, wikitext, summary, minor = false } = props
+  if (currentWikitext === wikitext) {
+    // 对比一下最新版与提交版本的区别
+      const isConfirm = await confirmModal(
+        '您提交的版本与页面的当前版本一致，您确定要继续吗？'
+      )
+      if (!isConfirm) return false
+  }
+  const { sectionTitle, summary, minor = false } = props
   const res = await mwApi.postWithEditToken({
     action: 'edit',
     formatversion: '2',

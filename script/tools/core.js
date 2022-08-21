@@ -1,5 +1,5 @@
 /*
- * @LastEditTime: 2022-08-07 17:34:50
+ * @LastEditTime: 2022-08-21 20:35:54
  * @Description: file content
  */
 const { build } = require('esbuild')
@@ -12,6 +12,7 @@ const defaultBuildConfig = {
   entryPoints: ['src/index.ts'],
   bundle: true,
   minify: false,
+  sourcemap: false,
   outfile: 'dist/index.js',
   target: 'es2017',
   charset: 'utf8',
