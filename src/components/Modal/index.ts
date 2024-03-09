@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-06 10:34:15
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-10 01:15:09
+ * @LastEditTime: 2024-03-10 02:41:18
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\Modal\index.ts
  */
@@ -62,7 +62,8 @@ export function createModal(props: {
     ? h(
         'div',
         {
-          className: 'wiki-salt-modal-title-btn wiki-salt-modal-title-close-btn',
+          className:
+            'wiki-salt-modal-title-btn wiki-salt-modal-title-close-btn',
           onclick: () => closeModal(),
         },
         '×'
@@ -71,11 +72,17 @@ export function createModal(props: {
   const modalTitle = h('div', {
     className: 'wiki-salt-modal-title ' + titleClassName,
   })
+  const modalTitleButtons = h(
+    'div',
+    { className: 'wiki-salt-modal-title-buttons' },
+    buttons,
+    closeBtn
+  )
   const modalTitleContainer = h(
     'div',
     { className: 'wiki-salt-modal-title-container ' + titleContainerClassName },
     modalTitle,
-    h('div', { className: 'wiki-salt-modal-title-buttons' }, buttons, closeBtn)
+    modalTitleButtons
   )
   const modalContentContainer = h('div', {
     className: 'wiki-salt-modal-content-container',
@@ -83,19 +90,19 @@ export function createModal(props: {
   // 拖拽用的条
   const leftBar = h('div', {
     className: 'wiki-salt-modal-drag-bar wiki-salt-modal-drag-bar-left',
-    title: '调整宽度'
+    title: '调整宽度',
   })
   const rightBar = h('div', {
     className: 'wiki-salt-modal-drag-bar wiki-salt-modal-drag-bar-right',
-    title: '调整宽度'
+    title: '调整宽度',
   })
   const topBar = h('div', {
     className: 'wiki-salt-modal-drag-bar wiki-salt-modal-drag-bar-top',
-    title: '调整高度'
+    title: '调整高度',
   })
   const bottomBar = h('div', {
     className: 'wiki-salt-modal-drag-bar wiki-salt-modal-drag-bar-bottom',
-    title: '调整高度'
+    title: '调整高度',
   })
   // 容器
   const modalContainer = h(
@@ -136,6 +143,8 @@ export function createModal(props: {
     modalContainer,
     /** 模态框标题容器 */
     modalTitleContainer,
+    /** 模态框标题栏右侧按钮容器 */
+    modalTitleButtons,
     /** 模态框标题 */
     modalTitle,
     /** 模态框内容容器 */

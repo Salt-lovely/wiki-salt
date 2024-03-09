@@ -12,6 +12,12 @@
       flex-direction: column;
       justify-content: flex-start;
       align-items: stretch;
+      // .wiki-salt-edit-modal-vertical-bar {
+      //   display: block;
+      // }
+      .wiki-salt-edit-modal-horizon-bar {
+        display: none;
+      }
     }
     // 左右排布
     &.horizon {
@@ -22,7 +28,7 @@
         top: 0;
         height: 100%;
         width: var(--textareaWidth, 50%);
-        padding-right: 8px;
+        // padding-right: 8px;
         .wiki-salt-edit-modal-edit-textarea {
           height: 100% !important;
           resize: none;
@@ -30,6 +36,12 @@
       }
       .wiki-salt-edit-modal-preview-panel {
         width: var(--previewWidth, 50%);
+      }
+      // .wiki-salt-edit-modal-horizon-bar {
+      //   display: block;
+      // }
+      .wiki-salt-edit-modal-vertical-bar {
+        display: none;
       }
     }
     .wiki-salt-edit-modal-edit-panel {
@@ -43,7 +55,7 @@
       position: relative;
       .wiki-salt-edit-modal-preview-btn-group {
         width: 100%;
-        margin: 8px 0;
+        margin: 8px 0 0;
         display: flex;
         flex-wrap: nowrap;
         align-items: center;
@@ -57,8 +69,32 @@
         }
       }
       .wiki-salt-edit-modal-preview-content {
-        padding: 8px 8px 4px;
-        border: 1px dashed #6666;
+        margin: 16px 8px 8px;
+        height: calc(100% - 40px - 16px);
+        overflow: auto;
+        box-shadow: 0 0 0 8px #1111;
+        // border: 1px dashed #6666;
+        > .mw-parser-output {
+          overflow: hidden;
+        }
+      }
+    }
+    // 上下排布时的高度调整条
+    .wiki-salt-edit-modal-vertical-bar {
+      height: 8px;
+      width: 100%;
+      cursor: n-resize;
+    }
+    // 左右排布时的宽度调整条
+    .wiki-salt-edit-modal-horizon-bar {
+      width: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: w-resize;
+      .wiki-salt-edit-modal-bar-icon {
+        font-size: 8px;
       }
     }
 

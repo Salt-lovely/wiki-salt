@@ -2,22 +2,21 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-09 16:02:42
+ * @LastEditTime: 2024-03-10 01:44:06
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
 import { confirmModal, createModal } from 'Components/Modal'
 import { info } from 'Components/notice'
-import h from 'Utils/h'
-import { saltConsole } from 'Utils/utils'
+import { h } from 'salt-lib'
 import {
   defaultSummary,
   getWikiText,
   parseWikiText,
   postEdit,
 } from 'Utils/wiki'
-
-const { log } = saltConsole
+import { createPreviewPanel } from './previewPanel'
+import { createResizeBar } from './resizeBar'
 
 export default async function createEditModal(props: {
   title: string
@@ -29,6 +28,7 @@ export default async function createEditModal(props: {
   const {
     modalContainer,
     modalTitleContainer,
+    modalTitleButtons,
     modalTitle,
     modalContentContainer,
     closeModal,
@@ -36,40 +36,70 @@ export default async function createEditModal(props: {
     className: 'wiki-salt-edit-modal',
     titleContainerClassName: 'wiki-salt-edit-modal-title',
     resizeCallback: ({ width, height }) => {
-      if (width > 960) {
-        modalContentContainer.classList.remove('vertical')
-        modalContentContainer.classList.add('horizon')
-        modalContentContainer.style.setProperty(
-          '--salt-wiki-editor-height',
-          `${height}px`
-        )
-      } else {
-        modalContentContainer.classList.add('vertical')
-        modalContentContainer.classList.remove('horizon')
-      }
+      Object.assign(state, {
+        width: modalContentContainer.offsetWidth,
+        height: modalContentContainer.offsetHeight,
+      })
     },
+    buttons: [],
   })
+  // 简单逻辑
+  let lastParseTime = 0
+  let timer = 0
+  const debounce = 2000
+  const state = {
+    width: modalContentContainer.offsetWidth,
+    height: modalContentContainer.offsetHeight,
+    /** 编辑后的wikitext */
+    editTxt: '正在加载...',
+    /** 编辑说明 */
+    summary: defaultSummary({ title, section, sectionTitle }),
+    /** 正在加载 */
+    isLoading: true,
+    /** 正在解析 */
+    isParsing: false,
+    /** 正在提交 */
+    isSubmit: false,
+    /** 正在提交 */
+    isMinor: false,
+    title,
+    section,
+    sectionTitle,
+    originTxt: '' as string | false,
+  }
+  const methods = {
+    /** 解析wikitext并放到previewContent上 */
+    parseTxt: async (wikitext: string, force?: boolean) => {
+      if (state.isSubmit) return false
+      if (state.isParsing) {
+        clearTimeout(timer)
+        timer = setTimeout(() => methods.parseTxt(wikitext), 500)
+        return false
+      }
+      if (!force && Date.now() - lastParseTime < debounce) {
+        const leftTime = debounce - Date.now() + lastParseTime
+        clearTimeout(timer)
+        timer = setTimeout(() => methods.parseTxt(wikitext), leftTime)
+        return false
+      }
+      state.isParsing = true
+      const res = await parseWikiText({ wikitext, title })
+      state.isParsing = false
+      lastParseTime = Date.now()
+      previewContent.innerHTML = res
+    },
+    closeModal,
+  }
   // 编辑框
-  /** 编辑后的wikitext */
-  let editTxt = '正在加载...'
-  /** 编辑说明 */
-  let summary = defaultSummary({ title, section, sectionTitle })
-  /** 正在加载 */
-  let isLoading = true
-  /** 正在解析 */
-  let isParsing = false
-  /** 正在提交 */
-  let isSubmit = false
-  /** 正在提交 */
-  let isMinor = false
   const editArea = h('textarea', {
     className: 'wiki-salt-edit-modal-edit-textarea',
-    value: editTxt,
+    value: state.editTxt,
     oninput: () => {
-      editTxt = editArea.value
+      state.editTxt = editArea.value
+      methods.parseTxt(state.editTxt, false)
     },
     onchange: () => {
-      editTxt = editArea.value
+      state.editTxt = editArea.value
     },
     disabled: true,
   })
@@ -81,107 +111,19 @@ export default async function createEditModal(props: {
     editArea
   )
   // 预览框
-  const previewContent = h(
-    'div',
-    { className: 'wiki-salt-edit-modal-preview-content mw-body-content' },
-    '正在加载...'
-  )
-  const previewBtn = h(
-    'div',
-    {
-      className: 'wiki-salt-edit-modal-btn wiki-salt-edit-modal-preview-btn',
-      onclick: async () => {
-        if (isSubmit || isLoading) return false
-        previewBtn.textContent = '获取预览...'
-        // const startTime = Date.now()
-        const res = await parseTxt(editTxt, true)
-        previewBtn.textContent = '预览'
-        if (res !== false) {
-          // info(`获取预览成功，耗时${Date.now() - startTime}ms`)
-        } else {
-          info(`获取预览失败`)
-        }
-      },
-    },
-    '预览'
-  )
-  const submitBtn = h(
-    'div',
-    {
-      className: 'wiki-salt-edit-modal-btn wiki-salt-edit-modal-preview-btn',
-      onclick: async () => {
-        if (isSubmit || isLoading) return false
-        isSubmit = true
-        if (!(await confirmModal('您确定要提交编辑吗？'))) {
-          isSubmit = false
-          return false
-        }
-        submitBtn.textContent = '正在提交...'
-        const startTime = Date.now()
-        const res = await postEdit({
-          title,
-          section,
-          sectionTitle,
-          summary,
-          minor: isMinor,
-          wikitext: editTxt,
-          originWikitext: originTxt as string,
-        })
-        if (res !== false) {
-          info(`编辑提交成功，耗时${Date.now() - startTime}ms，将刷新页面`)
-          setTimeout(() => {
-            closeModal()
-            location.reload()
-          }, 2500)
-        } else {
-          info(`编辑提交失败`)
-        }
-      },
-    },
-    '提交'
-  )
-  const minorBtn = h(
-    'div',
-    {
-      className:
-        'wiki-salt-edit-modal-btn wiki-salt-edit-modal-minor-btn not-minor',
-      onclick: async () => {
-        isMinor = !isMinor
-        minorBtn.textContent = isMinor ? '✔️小编辑' : '❌小编辑'
-        minorBtn.classList.add(isMinor ? 'is-minor' : 'not-minor')
-        minorBtn.classList.remove(isMinor ? 'not-minor' : 'is-minor')
-      },
-    },
-    '❌小编辑'
-  )
-  const summaryInput = h('input', {
-    className: 'wiki-salt-edit-modal-summary-input',
-    value: summary,
-    oninput: () => {
-      summary = summaryInput.value
-    },
-    onchange: () => {
-      summary = summaryInput.value
-    },
-  })
-  const previewPanel = h(
-    'div',
-    { className: 'wiki-salt-edit-modal-preview-panel' },
-    h(
-      'div',
-      { className: 'wiki-salt-edit-modal-preview-btn-group' },
-      previewBtn,
-      submitBtn,
-      minorBtn,
-      summaryInput
-    ),
-    previewContent
-  )
+  const {
+    previewContent,
+    previewBtn,
+    submitBtn,
+    minorBtn,
+    summaryInput,
+    previewPanel,
+  } = createPreviewPanel(state, methods)
   // 宽度控制
-  modalContentContainer.style.setProperty('--textareaWidth', `50%`)
-  modalContentContainer.style.setProperty('--previewWidth', `50%`)
-  modalContentContainer.classList.add(
-    modalContentContainer.offsetWidth > 960 ? 'horizon' : 'vertical'
+  const { horizonBar, verticalBar } = createResizeBar(
+    state,
+    methods,
+    modalContentContainer
   )
   // 模态框标题
   modalTitle.textContent = `编辑“${title}”页面${
@@ -189,40 +131,19 @@ export default async function createEditModal(props: {
   }`
   // 显示编辑框
   modalContentContainer.appendChild(editPanel)
+  modalContentContainer.appendChild(horizonBar)
+  // modalContentContainer.appendChild(verticalBar)
   modalContentContainer.appendChild(previewPanel)
-  // 简单逻辑
-  let lastParseTime = 0
-  let timer = 0
-  /** 解析wikitext并放到previewContent上 */
-  const parseTxt = async (wikitext: string, force?: boolean) => {
-    if (isSubmit) return false
-    if (isParsing) {
-      clearTimeout(timer)
-      timer = setTimeout(() => parseTxt(wikitext), 500)
-      return false
-    }
-    const debounce = 2000
-    if (!force && Date.now() - lastParseTime < debounce) {
-      const leftTime = debounce - Date.now() + lastParseTime
-      clearTimeout(timer)
-      timer = setTimeout(() => parseTxt(wikitext), leftTime)
-      return false
-    }
-    isParsing = true
-    const res = await parseWikiText({ wikitext, title })
-    isParsing = false
-    lastParseTime = Date.now()
-    previewContent.innerHTML = res
-  }
   // 获取文字和解析后的值
-  const originTxt = await getWikiText({ title, section })
-  if (originTxt === false) {
+  state.originTxt = await getWikiText({ title, section })
+  if (state.originTxt === false) {
+    info(`获取页面失败`)
     closeModal()
     return
   }
-  editArea.value = originTxt
-  editTxt = originTxt
-  await parseTxt(originTxt)
-  isLoading = false
+  editArea.value = state.originTxt
+  state.editTxt = state.originTxt
+  state.isLoading = false
   editArea.disabled = false
+  await methods.parseTxt(state.originTxt)
 }

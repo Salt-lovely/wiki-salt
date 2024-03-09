@@ -9,3 +9,5 @@
 export const helpNote = ``
 
 export const prefix = '[wiki-salt]'
+
+export const configPrefix = 'wiki-salt-config-'
