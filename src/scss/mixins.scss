@@ -2,13 +2,15 @@
   display: inline-block;
   min-width: $minWidth;
   height: $height;
+  min-height: $fontSize;
   line-height: $height;
-  padding: 4px 8px;
+  padding: 0 8px;
   border-radius: 4px;
   font-size: $fontSize;
   text-align: center;
   cursor: pointer;
   user-select: none;
+  box-sizing: border-box;
   &:hover {
     background-color: #9993;
   }
