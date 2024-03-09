@@ -7,7 +7,7 @@
  * @FilePath: \wiki-salt\src\model\addEditBtn\vector.ts
  */
 import { openEditModal } from 'Model/openEditModal'
-import h from 'Utils/h'
+import { h } from 'salt-lib'
 
 const topEditBtnQuery = '#ca-edit'
 const sectionEditBtnQuery = '.mw-editsection > a[href*="&action=edit"]'

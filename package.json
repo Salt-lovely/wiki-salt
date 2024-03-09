@@ -5,10 +5,10 @@
   "main": "src/index.ts",
   "devDependencies": {
     "@types/jquery": "^3.5.14",
-    "postcss": "^8.4.8",
-    "postcss-modules": "^4.3.1",
     "esbuild": "^0.14.11",
-    "esbuild-sass-plugin": "^2.2.4"
+    "esbuild-sass-plugin": "^2.2.4",
+    "postcss": "^8.4.8",
+    "postcss-modules": "^4.3.1"
   },
   "scripts": {
     "build": "node script/build.js",
@@ -18,5 +18,8 @@
     "wiki"
   ],
   "author": "salt-lovely",
-  "license": "MulanPSL-2.0"
+  "license": "MulanPSL-2.0",
+  "dependencies": {
+    "salt-lib": "^0.2.1"
+  }
 }

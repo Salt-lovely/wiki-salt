@@ -6,7 +6,7 @@
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\notice\index.ts
  */
-import h from 'Utils/h'
+import { h } from 'salt-lib'
 import { addStyle } from 'Utils/resource'
 import style from './index.t.scss'
 

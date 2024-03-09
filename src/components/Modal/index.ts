@@ -2,11 +2,11 @@
  * @Author: Salt
  * @Date: 2022-08-06 10:34:15
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 23:53:16
+ * @LastEditTime: 2024-03-09 23:47:41
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\components\Modal\index.ts
  */
-import h from 'Utils/h'
+import { h } from 'salt-lib'
 import { addStyle } from 'Utils/resource'
 import style from './index.t.scss'
 import { resizeBind } from './resize'

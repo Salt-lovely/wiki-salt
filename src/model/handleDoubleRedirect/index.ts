@@ -8,7 +8,7 @@
  */
 import { confirmModal } from 'Components/Modal'
 import WikiConstant from 'src/constant/wiki'
-import h from 'Utils/h'
+import { h } from 'salt-lib'
 import { postEdit } from 'Utils/wiki'
 /** 双重重定向处理 */
 export function handleDoubleRedirect() {
