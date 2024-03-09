@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-07 23:06:15
+ * @LastEditTime: 2024-03-09 16:02:42
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
@@ -60,6 +60,8 @@ export default async function createEditModal(props: {
   let isParsing = false
   /** 正在提交 */
   let isSubmit = false
+  /** 正在提交 */
+  let isMinor = false
   const editArea = h('textarea', {
     className: 'wiki-salt-edit-modal-edit-textarea',
     value: editTxt,
@@ -121,6 +123,7 @@ export default async function createEditModal(props: {
           section,
           sectionTitle,
           summary,
+          minor: isMinor,
           wikitext: editTxt,
           originWikitext: originTxt as string,
         })
@@ -136,6 +139,20 @@ export default async function createEditModal(props: {
       },
     },
     '提交'
+  )
+  const minorBtn = h(
+    'div',
+    {
+      className:
+        'wiki-salt-edit-modal-btn wiki-salt-edit-modal-minor-btn not-minor',
+      onclick: async () => {
+        isMinor = !isMinor
+        minorBtn.textContent = isMinor ? '✔️小编辑' : '❌小编辑'
+        minorBtn.classList.add(isMinor ? 'is-minor' : 'not-minor')
+        minorBtn.classList.remove(isMinor ? 'not-minor' : 'is-minor')
+      },
+    },
+    '❌小编辑'
   )
   const summaryInput = h('input', {
     className: 'wiki-salt-edit-modal-summary-input',
@@ -155,6 +172,7 @@ export default async function createEditModal(props: {
       { className: 'wiki-salt-edit-modal-preview-btn-group' },
       previewBtn,
       submitBtn,
+      minorBtn,
       summaryInput
     ),
     previewContent
