@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-21 19:35:08
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-21 20:28:53
+ * @LastEditTime: 2024-03-09 16:10:28
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\handleDoubleRedirect\index.ts
  */
@@ -63,7 +63,7 @@ export function handleDoubleRedirect() {
         minor: true,
         summary: `将“${startPage}”重定向到“${finalPage}”，维基盐双重重定向快速修复`,
       })
-      fastBtn.textContent = '（更改重定向）'
+      fastBtn.textContent = '（请刷新页面检查效果）'
     })
     editBtn.parentElement!.insertBefore(fastBtn, editBtn)
   })
