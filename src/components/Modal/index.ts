@@ -22,6 +22,7 @@ export function createModal(props: {
   closeButton?: boolean
   buttons?: HTMLElement[]
   onClose?: () => false | Promise<false> | unknown
+  onBeforeClose?: () => false | Promise<false> | unknown
   height?: number | string
   width?: number | string
   top?: number | string
@@ -43,6 +44,7 @@ export function createModal(props: {
     closeButton = true,
     buttons = [],
     onClose,
+    onBeforeClose,
     height = window.innerHeight * 0.8,
     width = window.innerWidth * 0.8,
     top = window.innerHeight * 0.1,
@@ -50,9 +52,12 @@ export function createModal(props: {
     resizeCallback,
   } = props
   const closeModal = async () => {
+    if (onBeforeClose) {
+      const res = await onBeforeClose()
+      if (res === false) return
+    }
     if (onClose) {
       const res = await onClose()
-      if (res === false) return
     }
     unbindResize() // 移除移动模态框的相关事件
     modalContainer.classList.add('wiki-salt-fade-out')

@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-10 03:29:20
+ * @LastEditTime: 2024-03-10 03:54:26
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
@@ -45,14 +45,38 @@ export default async function createEditModal(props: {
         height: modalContentContainer.offsetHeight,
       })
     },
-    buttons: [],
+    onBeforeClose: async () => {
+      if (!state.isLoading && !state.isSubmitSuccess) {
+        if (state.originTxt !== false && state.editTxt !== state.originTxt) {
+          return await confirmModal('您有未保存的更改，确定要关闭编辑框吗？')
+        }
+        if (state.isSubmit) {
+          return await confirmModal(`正在提交编辑，确定要关闭编辑框吗？`)
+        }
+      }
+    },
+    onClose: () => {
+      window.onclose = window.onbeforeunload = null
+    },
   })
+  // 防止手滑退出
+  window.onclose = window.onbeforeunload = () => {
+    if (!state.isLoading && !state.isSubmitSuccess) {
+      if (state.originTxt !== false && state.editTxt !== state.originTxt) {
+        return '您有未保存的更改，确定要关闭编辑框吗？'
+      }
+      if (state.isSubmit) {
+        return `正在提交编辑，确定要关闭编辑框吗？`
+      }
+    }
+  }
   // 简单逻辑
-  let lastParseTime = 0
-  // let lastSechTime = 0
-  let timer = 0
-  const debounce = 1000
-  const maxDebounce = 10000
+  let lastParseTime = 0 // `parseTxt`上一次成功解析
+  let lastSechTime = 0 // `parseTxt`上一次计划时间
+  let timer = 0 // `parseTxt`计划下一次执行
+  const debounce = 1000 // `parseTxt`防抖
+  const maxDebounce = 10000 // `parseTxt`最大执行间隔
+  // 状态
   const state = {
     width: modalContentContainer.offsetWidth,
     height: modalContentContainer.offsetHeight,
@@ -66,6 +90,8 @@ export default async function createEditModal(props: {
     isParsing: false,
     /** 正在提交 */
     isSubmit: false,
+    /** 提交成功 */
+    isSubmitSuccess: false,
     /** 是否为小编辑 */
     isMinor: read(DEFAULT_MINOR_KEY, false),
     /** 是否实时预览 */
@@ -73,23 +99,29 @@ export default async function createEditModal(props: {
     title,
     section,
     sectionTitle,
-    originTxt: '' as string | false,
+    originTxt: false as string | false,
   }
+  // 方法
   const methods = {
     /** 解析wikitext并放到previewContent上 */
     parseTxt: async (wikitext: string, force?: boolean) => {
       if (state.isSubmit) return false
+      const now = Date.now()
       if (state.isParsing) {
         clearTimeout(timer)
         timer = setTimeout(() => methods.parseTxt(wikitext), debounce)
-        // lastSechTime = Date.now()
+        lastSechTime = now
         return false
       }
-      if (!force && Date.now() - lastParseTime < maxDebounce) {
-        const leftTime = maxDebounce - Date.now() + lastParseTime
+      if (
+        !force &&
+        now - lastSechTime < debounce &&
+        now - lastParseTime < maxDebounce
+      ) {
+        const leftTime = Math.min(maxDebounce - now + lastParseTime, debounce)
         clearTimeout(timer)
-        timer = setTimeout(() => methods.parseTxt(wikitext), Math.min(leftTime, debounce))
-        // lastSechTime = Date.now()
+        timer = setTimeout(() => methods.parseTxt(wikitext), leftTime)
+        lastSechTime = Date.now()
         return false
       }
       state.isParsing = true
@@ -99,6 +131,7 @@ export default async function createEditModal(props: {
       previewContent.innerHTML = res
       previewBtn.textContent = '预览'
       lastParseTime = Date.now()
+      lastSechTime = Date.now()
     },
     closeModal,
     prependBtn: (btn: HTMLElement) => {

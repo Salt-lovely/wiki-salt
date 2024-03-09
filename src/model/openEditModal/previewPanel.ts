@@ -20,6 +20,7 @@ export function createPreviewPanel(
     isLoading: boolean
     isParsing: boolean
     isSubmit: boolean
+    isSubmitSuccess: boolean
     isMinor: boolean
     isLivePreview: boolean
     title: string
@@ -125,13 +126,16 @@ export function createPreviewPanel(
           originWikitext: state.originTxt as string,
         })
         if (res !== false) {
+          state.isSubmitSuccess = true
           info(`编辑提交成功，耗时${Date.now() - startTime}ms，将刷新页面`)
           setTimeout(() => {
             methods.closeModal()
             location.reload()
           }, 2500)
         } else {
+          state.isSubmit = false
           info(`编辑提交失败`)
+          submitBtn.textContent = '再次提交'
         }
       },
     },
