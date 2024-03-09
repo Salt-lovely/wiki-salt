@@ -2,20 +2,24 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-10 01:44:06
+ * @LastEditTime: 2024-03-10 03:29:20
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
 import { confirmModal, createModal } from 'Components/Modal'
 import { info } from 'Components/notice'
-import { h } from 'salt-lib'
+import { h, read } from 'salt-lib'
 import {
   defaultSummary,
   getWikiText,
   parseWikiText,
   postEdit,
 } from 'Utils/wiki'
-import { createPreviewPanel } from './previewPanel'
+import {
+  DEFAULT_MINOR_KEY,
+  LIVE_PREVIEW_KEY,
+  createPreviewPanel,
+} from './previewPanel'
 import { createResizeBar } from './resizeBar'
 
 export default async function createEditModal(props: {
@@ -45,8 +49,10 @@ export default async function createEditModal(props: {
   })
   // 简单逻辑
   let lastParseTime = 0
+  // let lastSechTime = 0
   let timer = 0
-  const debounce = 2000
+  const debounce = 1000
+  const maxDebounce = 10000
   const state = {
     width: modalContentContainer.offsetWidth,
     height: modalContentContainer.offsetHeight,
@@ -60,8 +66,10 @@ export default async function createEditModal(props: {
     isParsing: false,
     /** 正在提交 */
     isSubmit: false,
-    /** 正在提交 */
-    isMinor: false,
+    /** 是否为小编辑 */
+    isMinor: read(DEFAULT_MINOR_KEY, false),
+    /** 是否实时预览 */
+    isLivePreview: read(LIVE_PREVIEW_KEY, false),
     title,
     section,
     sectionTitle,
@@ -73,22 +81,29 @@ export default async function createEditModal(props: {
       if (state.isSubmit) return false
       if (state.isParsing) {
         clearTimeout(timer)
-        timer = setTimeout(() => methods.parseTxt(wikitext), 500)
+        timer = setTimeout(() => methods.parseTxt(wikitext), debounce)
+        // lastSechTime = Date.now()
         return false
       }
-      if (!force && Date.now() - lastParseTime < debounce) {
-        const leftTime = debounce - Date.now() + lastParseTime
+      if (!force && Date.now() - lastParseTime < maxDebounce) {
+        const leftTime = maxDebounce - Date.now() + lastParseTime
         clearTimeout(timer)
-        timer = setTimeout(() => methods.parseTxt(wikitext), leftTime)
+        timer = setTimeout(() => methods.parseTxt(wikitext), Math.min(leftTime, debounce))
+        // lastSechTime = Date.now()
         return false
       }
       state.isParsing = true
+      previewBtn.textContent = '预览...'
       const res = await parseWikiText({ wikitext, title })
       state.isParsing = false
-      lastParseTime = Date.now()
       previewContent.innerHTML = res
+      previewBtn.textContent = '预览'
+      lastParseTime = Date.now()
     },
     closeModal,
+    prependBtn: (btn: HTMLElement) => {
+      modalTitleButtons.prepend(btn)
+    },
   }
   // 编辑框
   const editArea = h('textarea', {
@@ -96,7 +111,7 @@ export default async function createEditModal(props: {
     value: state.editTxt,
     oninput: () => {
       state.editTxt = editArea.value
-      methods.parseTxt(state.editTxt, false)
+      if (state.isLivePreview) methods.parseTxt(state.editTxt, false)
     },
     onchange: () => {
       state.editTxt = editArea.value

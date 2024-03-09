@@ -3,6 +3,13 @@
 .wiki-salt-edit-modal {
   background-clip: padding-box;
   border: 8px solid #6666;
+  .wiki-salt-modal-title-container {
+    .wiki-salt-modal-title-buttons {
+      .wiki-salt-modal-title-btn {
+        font-size: 16px;
+      }
+    }
+  }
   .wiki-salt-modal-content-container {
     position: relative;
     display: flex;

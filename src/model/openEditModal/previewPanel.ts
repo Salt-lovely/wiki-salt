@@ -1,12 +1,16 @@
 import { confirmModal, createModal } from 'Components/Modal'
 import { info } from 'Components/notice'
-import { h } from 'salt-lib'
+import { h, readAndListen, write } from 'salt-lib'
+import { configPrefix } from 'src/constant/note'
 import {
   defaultSummary,
   getWikiText,
   parseWikiText,
   postEdit,
 } from 'Utils/wiki'
+
+export const DEFAULT_MINOR_KEY = `${configPrefix}EditDefaultMinor`
+export const LIVE_PREVIEW_KEY = `${configPrefix}EditLivePreview`
 
 export function createPreviewPanel(
   state: {
@@ -17,6 +21,7 @@ export function createPreviewPanel(
     isParsing: boolean
     isSubmit: boolean
     isMinor: boolean
+    isLivePreview: boolean
     title: string
     section: string | undefined
     sectionTitle: string | undefined
@@ -24,8 +29,57 @@ export function createPreviewPanel(
   methods: {
     parseTxt: (wikitext: string, force?: boolean) => Promise<false | undefined>
     closeModal: () => Promise<void>
+    prependBtn: (btn: HTMLElement) => void
   }
 ) {
+  // 页面顶部按钮
+  let [isDefaultMinor] = readAndListen({
+    key: DEFAULT_MINOR_KEY,
+    defaultValue: false,
+    listener({ newValue }) {
+      isDefaultMinor = newValue || false
+      defaultMinorBtn.textContent = newValue ? '✔️默认小编辑' : '❌默认小编辑'
+    },
+  })
+  const defaultMinorBtn = h(
+    'div',
+    {
+      className: 'wiki-salt-modal-title-btn',
+      onclick() {
+        isDefaultMinor = !isDefaultMinor
+        write(DEFAULT_MINOR_KEY, isDefaultMinor)
+        defaultMinorBtn.textContent = isDefaultMinor
+          ? '✔️默认小编辑'
+          : '❌默认小编辑'
+      },
+    },
+    isDefaultMinor ? '✔️默认小编辑' : '❌默认小编辑'
+  )
+  readAndListen({
+    key: LIVE_PREVIEW_KEY,
+    defaultValue: false,
+    listener({ newValue }) {
+      state.isLivePreview = newValue || false
+      livePreviewBtn.textContent = newValue ? '✔️实时预览' : '❌实时预览'
+    },
+  })
+  const livePreviewBtn = h(
+    'div',
+    {
+      className: 'wiki-salt-modal-title-btn',
+      onclick() {
+        state.isLivePreview = !state.isLivePreview
+        write(LIVE_PREVIEW_KEY, state.isLivePreview)
+        livePreviewBtn.textContent = state.isLivePreview
+          ? '✔️实时预览'
+          : '❌实时预览'
+      },
+    },
+    state.isLivePreview ? '✔️实时预览' : '❌实时预览'
+  )
+  methods.prependBtn(defaultMinorBtn)
+  methods.prependBtn(livePreviewBtn)
+  // 预览框
   const previewContent = h(
     'div',
     { className: 'wiki-salt-edit-modal-preview-content mw-body-content' },
@@ -37,10 +91,8 @@ export function createPreviewPanel(
       className: 'wiki-salt-edit-modal-btn wiki-salt-edit-modal-preview-btn',
       onclick: async () => {
         if (state.isSubmit || state.isLoading) return false
-        previewBtn.textContent = '获取预览...'
         // const startTime = Date.now()
         const res = await methods.parseTxt(state.editTxt, true)
-        previewBtn.textContent = '预览'
         if (res !== false) {
           // info(`获取预览成功，耗时${Date.now() - startTime}ms`)
         } else {
@@ -97,7 +149,7 @@ export function createPreviewPanel(
         minorBtn.classList.remove(state.isMinor ? 'not-minor' : 'is-minor')
       },
     },
-    '❌小编辑'
+    state.isMinor ? '✔️小编辑' : '❌小编辑'
   )
   const summaryInput = h('input', {
     className: 'wiki-salt-edit-modal-summary-input',
