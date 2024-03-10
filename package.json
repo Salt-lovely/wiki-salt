@@ -4,6 +4,7 @@
   "description": "MediaWiki wiki-salt script",
   "main": "src/index.ts",
   "devDependencies": {
+    "@types/codemirror": "^5.60.15",
     "@types/jquery": "^3.5.14",
     "esbuild": "^0.14.11",
     "esbuild-sass-plugin": "^2.2.4",
