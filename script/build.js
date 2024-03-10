@@ -1,10 +1,14 @@
 /*
- * @LastEditTime: 2022-08-07 17:34:59
+ * @LastEditTime: 2024-03-10 19:20:18
  * @Description: 打包到 dist
  */
 
+const { banner } = require('./banner')
+
 const commonBuild = {
-  props: {},
+  props: {
+    banner,
+  },
   define: {
     __DEV__: 'false',
     'process.env.NODE_ENV': '"production"',
