@@ -44,6 +44,7 @@
     .wiki-salt-modal-title-buttons {
       .wiki-salt-modal-title-btn {
         @include btn($height: 32px, $fontSize: 24px);
+        white-space: nowrap;
       }
     }
     .wiki-salt-modal-title-close-btn {

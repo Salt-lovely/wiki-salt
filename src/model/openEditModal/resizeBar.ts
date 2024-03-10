@@ -6,24 +6,11 @@ export const TEXTAREA_WIDTH_KEY = `${configPrefix}EditTextareaWidth`
 
 export function createResizeBar(
   state: { width: number; height: number },
-  methods: {},
+  methods: {
+    prependBtn: (btn: HTMLElement) => void
+  },
   container: HTMLElement
 ) {
-  const horizonBar = h(
-    'div',
-    {
-      className: 'wiki-salt-edit-modal-horizon-bar',
-      title: '左右拖动可以调整宽度，双击恢复宽度',
-    },
-    h('div', { className: 'wiki-salt-edit-modal-bar-icon' }, '|||')
-  )
-  const verticalBar = h(
-    'div',
-    {
-      className: 'wiki-salt-edit-modal-vertical-bar',
-    },
-    h('div', { className: 'wiki-salt-edit-modal-bar-icon' }, '---')
-  )
   let [isHorizon] = readAndListen({
     key: IS_HORIZON_KEY,
     defaultValue: container.offsetWidth > 960 ? 'horizon' : 'vertical',
@@ -40,6 +27,36 @@ export function createResizeBar(
       if (isHorizon === 'horizon') setStyle()
     },
   })
+  const switchBtn = h(
+    'div',
+    {
+      className: 'wiki-salt-modal-title-btn',
+      title: '切换编辑框视图为左右/上下结构',
+      onClick: () => {
+        isHorizon = isHorizon === 'horizon' ? 'vertical' : 'horizon'
+        switchBtn.textContent = isHorizon === 'horizon' ? '⿰横排' : '⿱竖排'
+        write(IS_HORIZON_KEY, isHorizon)
+        setStyle()
+      },
+    },
+    isHorizon === 'horizon' ? '⿰横排' : '⿱竖排'
+  )
+  methods.prependBtn(switchBtn)
+  const horizonBar = h(
+    'div',
+    {
+      className: 'wiki-salt-edit-modal-horizon-bar',
+      title: '左右拖动可以调整宽度，双击恢复宽度',
+    },
+    h('div', { className: 'wiki-salt-edit-modal-bar-icon' }, '|||')
+  )
+  const verticalBar = h(
+    'div',
+    {
+      className: 'wiki-salt-edit-modal-vertical-bar',
+    },
+    h('div', { className: 'wiki-salt-edit-modal-bar-icon' }, '---')
+  )
   const setStyle = () => {
     if (isHorizon === 'horizon') {
       container.classList.remove('vertical')
@@ -81,11 +98,8 @@ function bindHorizon({
     active: false,
   }
   horizonBar.addEventListener('dblclick', (ev) => {
-    console.log(ev)
-    // if (ev.button === 2) {
     callback(50, true)
     ev.preventDefault()
-    // }
   })
   horizonBar.addEventListener('mousedown', (ev) => {
     if (ev.button === 0) {
