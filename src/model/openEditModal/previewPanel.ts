@@ -1,5 +1,5 @@
 import { confirmModal, createModal } from 'Components/Modal'
-import { info } from 'Components/notice'
+import { alarm, info } from 'Components/notice'
 import { h, readAndListen, write } from 'salt-lib'
 import { configPrefix } from 'src/constant/note'
 import {
@@ -8,6 +8,7 @@ import {
   parseWikiText,
   postEdit,
 } from 'Utils/wiki'
+import { getEditErrorMsg } from './utils'
 
 export const DEFAULT_MINOR_KEY = `${configPrefix}EditDefaultMinor`
 export const LIVE_PREVIEW_KEY = `${configPrefix}EditLivePreview`
@@ -116,25 +117,32 @@ export function createPreviewPanel(
         }
         submitBtn.textContent = '正在提交...'
         const startTime = Date.now()
-        const res = await postEdit({
-          title: state.title,
-          section: state.section,
-          sectionTitle: state.sectionTitle,
-          summary: state.summary,
-          minor: state.isMinor,
-          wikitext: state.editTxt,
-          originWikitext: state.originTxt as string,
-        })
-        if (res !== false) {
-          state.isSubmitSuccess = true
-          info(`编辑提交成功，耗时${Date.now() - startTime}ms，将刷新页面`)
-          setTimeout(() => {
-            methods.closeModal()
-            location.reload()
-          }, 2500)
-        } else {
+        try {
+          const res = await postEdit({
+            title: state.title,
+            section: state.section,
+            sectionTitle: state.sectionTitle,
+            summary: state.summary,
+            minor: state.isMinor,
+            wikitext: state.editTxt,
+            originWikitext: state.originTxt as string,
+          })
+          if (res !== false) {
+            state.isSubmitSuccess = true
+            info(`编辑提交成功，耗时${Date.now() - startTime}ms，将刷新页面`)
+            setTimeout(() => {
+              methods.closeModal()
+              location.reload()
+            }, 2500)
+          } else {
+            state.isSubmit = false
+            info(`编辑提交失败`)
+            submitBtn.textContent = '再次提交'
+          }
+        } catch (e) {
+          console.log('编辑提交失败\n', e)
           state.isSubmit = false
-          info(`编辑提交失败`)
+          alarm(`${getEditErrorMsg(e)}`, '编辑提交失败')
           submitBtn.textContent = '再次提交'
         }
       },
