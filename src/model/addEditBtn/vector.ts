@@ -11,7 +11,7 @@ import { h } from 'salt-lib'
 
 const topEditBtnQuery = '#ca-edit'
 const sectionEditBtnQuery = '.mw-editsection > a[href*="&action=edit"]'
-export default function vector() {
+export default function vector(skin: string) {
   // 顶部编辑按钮
   const topBtn = document.body.querySelector(topEditBtnQuery)
   const btn = h(
@@ -32,6 +32,7 @@ export default function vector() {
       '盐编辑'
     )
   )
+  if (skin === 'vector-2022') btn.classList.add('vector-tab-noicon')
   if (topBtn) {
     if (topBtn.nextSibling) {
       topBtn.parentElement!.insertBefore(btn, topBtn.nextSibling)
