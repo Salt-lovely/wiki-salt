@@ -1,7 +1,7 @@
 {
   "name": "wiki-salt",
-  "version": "1.0.0",
-  "description": "MediaWiki wiki-salt script",
+  "version": "1.0.1",
+  "description": "MediaWiki wiki-salt script, require MediaWiki 1.28+ and ESScript 2017+",
   "main": "src/index.ts",
   "devDependencies": {
     "@types/codemirror": "^5.60.15",
@@ -11,6 +11,9 @@
     "postcss": "^8.4.8",
     "postcss-modules": "^4.3.1"
   },
+  "dependencies": {
+    "salt-lib": "^0.2.1"
+  },
   "scripts": {
     "build": "node script/build.js",
     "watch": "node script/watch.js"
@@ -19,8 +22,5 @@
     "wiki"
   ],
   "author": "salt-lovely",
-  "license": "MulanPSL-2.0",
-  "dependencies": {
-    "salt-lib": "^0.2.1"
-  }
+  "license": "MulanPSL-2.0"
 }
