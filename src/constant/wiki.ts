@@ -1,7 +1,7 @@
 /*
  * @Author: Wikiplus
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-21 19:39:01
+ * @LastEditTime: 2024-03-10 17:45:11
  * @Description: 使用了Wikiplus的src/utils/constants.js
  * @FilePath: \wiki-salt\src\constant\wiki.ts
  */
@@ -55,6 +55,10 @@ class WikiConstants {
   /** 用户组，未登录时为`["*"]` */
   get userGroups(): string[] {
     return getConfig('wgUserGroups')
+  }
+  /** 页面模型，一般为`wikitext`JS页面为`javascript`CSS页面为`css` */
+  get pageContentModel(): 'wikitext' | 'javascript' | 'css' | string {
+    return getConfig('wgPageContentModel')
   }
   get wikiId() {
     return getConfig('wgWikiID')

@@ -2,10 +2,11 @@
  * @Author: Salt
  * @Date: 2022-07-09 13:48:48
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-06 18:50:18
+ * @LastEditTime: 2024-03-10 18:30:02
  * @Description: 全局类型定义
  * @FilePath: \wiki-salt\src\global.d.ts
  */
+/// <reference path="./codeMirror" />
 interface Window {
   we: any
 }
@@ -16,13 +17,24 @@ interface MediaWiki {
   }
   config: mwConfig
   html: any
-  loader: any
+  loader: mwLoader
 }
 interface mwConfig {
   get(selection: string, fallback?: any)
   set(selection: string, value: string)
   exists(selection: string)
   values: any
+}
+interface mwLoader {
+  load(modules: string | string[], type: string): void
+  using(
+    dependencies: string | string[],
+    ready?: unknown,
+    error?: unknown
+  ): Promise<unknown>
+  getState(
+    module: string
+  ): 'registered' | 'loaded' | 'loading' | 'executing' | 'ready' | 'missing' | 'error'
 }
 interface mwApi {
   abort()
