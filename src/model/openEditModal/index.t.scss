@@ -7,6 +7,22 @@
     .wiki-salt-modal-title-buttons {
       .wiki-salt-modal-title-btn {
         font-size: 16px;
+        &.cm-enable {
+          color: #36c;
+          // .left-angle {
+          // }
+          .center-slash {
+            color: #c36;
+          }
+          // .right-angle {
+          // }
+        }
+        &.cm-disable {
+          color: #36c;
+          .cm-btn-txt {
+            color: #222;
+          }
+        }
       }
     }
   }
@@ -56,6 +72,14 @@
         width: 100%;
         min-height: 240px;
         resize: vertical;
+      }
+      .wiki-salt-edit-modal-edit-CM {
+        > .CodeMirror {
+          height: 100%;
+          pre.CodeMirror-line {
+            background-color: transparent !important;
+          }
+        }
       }
     }
     .wiki-salt-edit-modal-preview-panel {

@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-10 03:54:26
+ * @LastEditTime: 2024-03-23 19:15:57
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
@@ -15,12 +15,22 @@ import {
   parseWikiText,
   postEdit,
 } from 'Utils/wiki'
+import { saltConsole } from 'Utils/utils'
+
 import {
   DEFAULT_MINOR_KEY,
   LIVE_PREVIEW_KEY,
   createPreviewPanel,
 } from './previewPanel'
 import { createResizeBar } from './resizeBar'
+import {
+  enableCodeMirrorButton,
+  loadCodeMirror,
+  queryCodeMirror,
+  useCodeMirror,
+} from './codeMirror'
+
+const { log } = saltConsole
 
 export default async function createEditModal(props: {
   title: string
@@ -28,6 +38,7 @@ export default async function createEditModal(props: {
   sectionTitle?: string
 }) {
   const { title, section, sectionTitle } = props
+
   // 对话框
   const {
     modalContainer,
@@ -59,6 +70,7 @@ export default async function createEditModal(props: {
       window.onclose = window.onbeforeunload = null
     },
   })
+
   // 防止手滑退出
   window.onclose = window.onbeforeunload = () => {
     if (!state.isLoading && !state.isSubmitSuccess) {
@@ -70,16 +82,19 @@ export default async function createEditModal(props: {
       }
     }
   }
+
   // 简单逻辑
   let lastParseTime = 0 // `parseTxt`上一次成功解析
   let lastSechTime = 0 // `parseTxt`上一次计划时间
   let timer = 0 // `parseTxt`计划下一次执行
   const debounce = 1000 // `parseTxt`防抖
   const maxDebounce = 10000 // `parseTxt`最大执行间隔
+
   // 状态
   const state = {
     width: modalContentContainer.offsetWidth,
     height: modalContentContainer.offsetHeight,
+    currentEditor: 'TextArea' as 'TextArea' | 'CodeMirror',
     /** 编辑后的wikitext */
     editTxt: '正在加载...',
     /** 编辑说明 */
@@ -100,7 +115,9 @@ export default async function createEditModal(props: {
     section,
     sectionTitle,
     originTxt: false as string | false,
+    editor: null as CodeMirror.Editor | null,
   }
+
   // 方法
   const methods = {
     /** 解析wikitext并放到previewContent上 */
@@ -137,7 +154,54 @@ export default async function createEditModal(props: {
     prependBtn: (btn: HTMLElement) => {
       modalTitleButtons.prepend(btn)
     },
+    loadCMEditor: async (loader?: Promise<boolean>) => {
+      if (queryCodeMirror()) {
+        let loadSuccess = false
+        if (loader) loadSuccess = await loader
+        else loadSuccess = await loadCodeMirror(title)
+        if (!loadSuccess) return false
+        // 加载CodeMirror
+        if (state.editor) return false // 中途有其他地方重复调用，而且已经加载好了这个编辑器
+        const editor = useCodeMirror(editCM, state, methods)
+        if (editor) {
+          state.editor = editor
+          editor.on('change', () => {
+            state.editTxt = editor.getValue()
+            if (state.isLivePreview) methods.parseTxt(state.editTxt, false)
+          })
+          return true
+        }
+      }
+      return false
+    },
+    showCMEditor: () => {
+      if (state.editor && getEnableCM()) {
+        state.currentEditor = 'CodeMirror'
+        editArea.style.display = 'none'
+        editCM.style.display = 'block'
+        methods.updateCMEditor()
+      } else {
+        methods.loadCMEditor().then((res) => {
+          if (res && getEnableCM()) methods.showCMEditor()
+        })
+      }
+    },
+    updateCMEditor: () => {
+      if (state.editor && state.currentEditor === 'CodeMirror') {
+        state.editor.setValue(state.editTxt)
+        state.editor.focus()
+        state.editor.refresh()
+      }
+    },
+    showTextAreaEditor: () => {
+      if (!getEnableCM()) {
+        state.currentEditor = 'TextArea'
+        editCM.style.display = 'none'
+        editArea.style.display = 'block'
+      }
+    },
   }
+
   // 编辑框
   const editArea = h('textarea', {
     className: 'wiki-salt-edit-modal-edit-textarea',
@@ -151,13 +215,20 @@ export default async function createEditModal(props: {
     },
     disabled: true,
   })
+  const editCM = h('div', {
+    className:
+      'wiki-salt-edit-modal-edit-textarea wiki-salt-edit-modal-edit-CM',
+    style: { display: 'none' },
+  })
   const editPanel = h(
     'div',
     {
       className: 'wiki-salt-edit-modal-edit-panel',
     },
-    editArea
+    editArea,
+    editCM
   )
+
   // 预览框
   const {
     previewContent,
@@ -167,21 +238,40 @@ export default async function createEditModal(props: {
     summaryInput,
     previewPanel,
   } = createPreviewPanel(state, methods)
+
   // 宽度控制
   const { horizonBar, verticalBar } = createResizeBar(
     state,
     methods,
     modalContentContainer
   )
+
   // 模态框标题
   modalTitle.textContent = `编辑“${title}”页面${
     sectionTitle ? `的“${sectionTitle}”章节` : ''
   }`
+
   // 显示编辑框
   modalContentContainer.appendChild(editPanel)
   modalContentContainer.appendChild(horizonBar)
   // modalContentContainer.appendChild(verticalBar)
   modalContentContainer.appendChild(previewPanel)
+
+  // 预加载CodeMirror功能
+  /** 当前Wiki是否存在CodeMirror功能 */
+  const hasCodeMirror = queryCodeMirror()
+  const { getEnableCM, enableCMButton } = enableCodeMirrorButton(state, methods)
+  let loadCodeMirrorPromise: Promise<boolean> = Promise.resolve(false)
+  log(
+    `当前Wiki是否存在CodeMirror功能:`,
+    hasCodeMirror,
+    '; 使用CodeMirror编辑框:',
+    getEnableCM()
+  )
+  if (hasCodeMirror && getEnableCM()) {
+    loadCodeMirrorPromise = loadCodeMirror(title)
+  }
+
   // 获取文字和解析后的值
   state.originTxt = await getWikiText({ title, section })
   if (state.originTxt === false) {
@@ -193,5 +283,12 @@ export default async function createEditModal(props: {
   state.editTxt = state.originTxt
   state.isLoading = false
   editArea.disabled = false
-  await methods.parseTxt(state.originTxt)
+  methods.parseTxt(state.originTxt)
+
+  // 正式加载CodeMirror功能
+  if (hasCodeMirror && getEnableCM()) {
+    methods.loadCMEditor(loadCodeMirrorPromise).then((res) => {
+      if (res) methods.showCMEditor()
+    })
+  }
 }

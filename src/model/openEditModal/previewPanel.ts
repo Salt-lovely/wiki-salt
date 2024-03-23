@@ -8,8 +8,10 @@ import {
   parseWikiText,
   postEdit,
 } from 'Utils/wiki'
+import { saltConsole } from 'Utils/utils'
 import { getEditErrorMsg } from './utils'
 
+const { log } = saltConsole
 export const DEFAULT_MINOR_KEY = `${configPrefix}EditDefaultMinor`
 export const LIVE_PREVIEW_KEY = `${configPrefix}EditLivePreview`
 
@@ -140,7 +142,7 @@ export function createPreviewPanel(
             submitBtn.textContent = '再次提交'
           }
         } catch (e) {
-          console.log('编辑提交失败\n', e)
+          log('编辑提交失败\n', e)
           state.isSubmit = false
           alarm(`${getEditErrorMsg(e)}`, '编辑提交失败')
           submitBtn.textContent = '再次提交'

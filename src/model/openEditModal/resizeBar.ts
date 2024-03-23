@@ -8,6 +8,7 @@ export function createResizeBar(
   state: { width: number; height: number },
   methods: {
     prependBtn: (btn: HTMLElement) => void
+    updateCMEditor: () => void
   },
   container: HTMLElement
 ) {
@@ -76,7 +77,10 @@ export function createResizeBar(
     container,
     callback(width: number, record = false) {
       textareaWidth = width
-      if (record) write(TEXTAREA_WIDTH_KEY, width)
+      if (record) {
+        write(TEXTAREA_WIDTH_KEY, width)
+        methods.updateCMEditor()
+      }
       setStyle()
     },
   })
