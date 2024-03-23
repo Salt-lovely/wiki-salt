@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 21:33:49
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-21 20:18:58
+ * @LastEditTime: 2024-03-23 19:55:17
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\wiki.ts
  */
@@ -131,10 +131,10 @@ export async function postEdit(props: {
   }
   if (currentWikitext === wikitext) {
     // 对比一下最新版与提交版本的区别
-      const isConfirm = await confirmModal(
-        '您提交的版本与页面的当前版本一致，您确定要继续吗？'
-      )
-      if (!isConfirm) return false
+    const isConfirm = await confirmModal(
+      '您提交的版本与页面的当前版本一致，您确定要继续吗？'
+    )
+    if (!isConfirm) return false
   }
   const { sectionTitle, summary, minor = false } = props
   const res = await mwApi.postWithEditToken({
@@ -159,13 +159,12 @@ export function defaultSummary(props: {
   isEditing?: boolean
 }) {
   const { title, section, sectionTitle, isEditing = true } = props
-  if (!title) return '// 维基盐编辑器'
+  const suffix = '// WikiSalt Editor'
+  if (!title) return suffix
   if (!section || !sectionTitle) {
-    return isEditing
-      ? `编辑“${title}” // 维基盐编辑器`
-      : `创建“${title}” // 维基盐编辑器`
+    return `${isEditing ? '编辑' : '创建'}“${title}” ${suffix}`
   }
-  return isEditing
-    ? `编辑“${title}”的“${sectionTitle}”章节 // 维基盐编辑器`
-    : `编辑“${title}”的“${sectionTitle}”章节 // 维基盐编辑器`
+  return `${
+    isEditing ? '编辑' : '创建'
+  }“${title}”的“${sectionTitle}”章节 ${suffix}`
 }

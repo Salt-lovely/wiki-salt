@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:29:16
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-23 19:15:57
+ * @LastEditTime: 2024-03-23 19:44:47
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\openEditModal\createEditModal.ts
  */
@@ -87,6 +87,7 @@ export default async function createEditModal(props: {
   let lastParseTime = 0 // `parseTxt`上一次成功解析
   let lastSechTime = 0 // `parseTxt`上一次计划时间
   let timer = 0 // `parseTxt`计划下一次执行
+  let lastPreviewText = '' // `parseTxt`上一次预览的文字
   const debounce = 1000 // `parseTxt`防抖
   const maxDebounce = 10000 // `parseTxt`最大执行间隔
 
@@ -143,9 +144,12 @@ export default async function createEditModal(props: {
       }
       state.isParsing = true
       previewBtn.textContent = '预览...'
-      const res = await parseWikiText({ wikitext, title })
+      if (lastPreviewText !== wikitext || force) {
+        const res = await parseWikiText({ wikitext, title })
+        previewContent.innerHTML = res
+        lastPreviewText = wikitext
+      }
       state.isParsing = false
-      previewContent.innerHTML = res
       previewBtn.textContent = '预览'
       lastParseTime = Date.now()
       lastSechTime = Date.now()
