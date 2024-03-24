@@ -15,7 +15,7 @@ const { log } = saltConsole
  * 实现了实用方法
  */
 export default class SaltWikiEditHelper extends SaltOriginalClass {
-  constructor(ver?: string, note?: string) {
+  constructor(ver?: string, note?: saltWikiHelpNote) {
     super(ver, note)
     // 完成构造
     log('构造完成...')

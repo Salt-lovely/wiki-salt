@@ -2,9 +2,9 @@
  * @Author: Salt
  * @Date: 2022-07-09 16:09:27
  * @LastEditors: Salt
- * @LastEditTime: 2022-07-24 00:01:29
+ * @LastEditTime: 2024-03-24 18:54:59
  * @Description: 这个文件的功能
- * @FilePath: \salt-wiki-editor\src\class\salt.d.ts
+ * @FilePath: \wiki-salt\src\class\salt.d.ts
  */
 interface defaultEditConfig {
   /** 被替换的内容，可以用正则表达式 */
@@ -13,6 +13,20 @@ interface defaultEditConfig {
   after: string
   /** 提交编辑时的摘要 */
   sum?: string
+}
+interface handlerEditConfig extends defaultEditConfig {
+  /** 提交编辑时的摘要 */
+  summary: string
+  /**
+   * 有`handler`时优先使用（忽略`before`和`after`）
+   * @param text 页面的源码
+   * @param title 页面标题
+   * @returns 需要至少返回一个`{ text: string }`
+   */
+  handler: (
+    text: string,
+    title: string
+  ) => { text: string; summary?: string; minor: boolean }
 }
 interface timeInterval {
   /** 替换的时间间隔，推荐 200-300，超过15个时建议 500，超过35个时建议 750，超过50个时建议 1000，超过100个时建议1500 */
@@ -48,3 +62,15 @@ interface wikiSearchAndReplaceProps extends defaultEditConfig, timeInterval {
   /** 搜索方向，text-内容，title-标题 */
   srwhat?: 'text' | 'title'
 }
+/** 帮助文件 */
+type saltWikiHelpNote = {
+  basic: string
+  short?: string
+  methods: { name: string; params: saltWikiHelpNoteParam, desc?:string }[]
+}
+type saltWikiHelpNoteParam = {
+  name: string
+  type?: string
+  desc: string
+  require?: boolean
+}[]

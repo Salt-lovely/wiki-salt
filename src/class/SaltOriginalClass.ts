@@ -2,11 +2,11 @@
  * @Author: Salt
  * @Date: 2022-07-09 15:13:33
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-04 20:28:56
+ * @LastEditTime: 2024-03-24 20:17:48
  * @Description: 实现基础功能的类
  * @FilePath: \wiki-salt\src\class\SaltOriginalClass.ts
  */
-import { saltConsole, assert, sleep } from 'Utils/utils'
+import { saltConsole, assert, sleep, indent } from 'Utils/utils'
 
 const { log } = saltConsole
 
@@ -15,14 +15,14 @@ const { log } = saltConsole
  */
 export default class SaltOriginalClass {
   ver: string
-  note: string
+  note: saltWikiHelpNote
   /** MediaWiki的API实例 */
   mwApi: mwApi | undefined // 啊啊啊啊这个检查好烦啊（虽然帮忙找错很管用）
   /** 缓存的页面名列表，特殊标记（; ）（一个半角分号+一个空格）隔开 */
   titleList: string = ''
-  constructor(ver?: string, note?: string) {
+  constructor(ver?: string, note?: saltWikiHelpNote) {
     this.ver = ver || ''
-    this.note = note || ''
+    this.note = note || { basic: '', short: 'SaltWikiEditHelper', methods: [] }
     this.getMwApi()
     // 检查mw.Api原型的方法
     this.addPlugin()
@@ -32,8 +32,36 @@ export default class SaltOriginalClass {
     log(`\n Version: ${this.ver}\n Author: Salt_lovely\n License: MulanPSL-2.0`)
   }
   /** 获取帮助信息 */
-  usage() {
-    log(this.note)
+  usage(methodsName?: string) {
+    const handlerFnParams = (fn: saltWikiHelpNoteParam) => {
+      return (
+        fn
+          .map(
+            ({ name, type, desc, require }) =>
+              `${name}${require ? '*必填*' : ''}: ${type || ''} ${desc}`
+          )
+          .join('\n') + '\n'
+      )
+    }
+    const handlerFn = (fn: {
+      name: string
+      params: saltWikiHelpNoteParam
+      desc?: string
+    }) => {
+      return (
+        `${short}.${fn.name}(${fn.params.map(({ name }) => name).join(', ')})` +
+        '\n' +
+        indent((fn.desc ? fn.desc + '\n' : '') + handlerFnParams(fn.params))
+      )
+    }
+    const { basic, short, methods } = this.note
+    const findMethods = methods.find(({ name }) => name === methodsName)
+    if (findMethods) {
+      return log(handlerFn(findMethods))
+    } else {
+      return `${basic}\n\n${indent(methods.map(handlerFn).join('\n')).trim()}`
+    }
+    // log(this.note)
   }
   help = this.usage
   /** 获取自己的信息 */
@@ -70,6 +98,29 @@ export default class SaltOriginalClass {
     }
   }
 
+  async editHandler(
+    page: string,
+    config: Partial<handlerEditConfig> & {
+      minor?: boolean
+      section?: number
+      sectiontitle?: string
+      bot?: boolean
+    }
+  ) {
+    if (!this.mwApi) return
+    const { before, after, handler, sum, ...otherConfig } = config
+    return await this.mwApi.edit(page, function (revision: any) {
+      const res = { text: revision.content, summary: sum }
+      if (before != null && after != null) {
+        res.text = res.text.replace(before, after)
+      } else if (typeof handler === 'function') {
+        let textRes = handler(res.text, page)
+        if (typeof textRes.text === 'string') Object.assign(res, textRes)
+      }
+      return Object.assign({}, res, otherConfig)
+    })
+  }
+
   /** 替换当前页面内容 */
   async pageEdit(props: pageEditProps) {
     const { before, after, sum = '', pageName } = props
@@ -77,12 +128,11 @@ export default class SaltOriginalClass {
     if (!this.pageNameCheck(page) || !this.mwApi) {
       return
     }
-    await this.mwApi.edit(page, function (revision: any) {
-      return {
-        text: revision.content.replace(before, after),
-        summary: sum,
-        minor: true,
-      }
+    await this.editHandler(page, {
+      before,
+      after,
+      summary: sum,
+      minor: true,
     })
     log('编辑已保存: ' + page)
   }
@@ -109,12 +159,11 @@ export default class SaltOriginalClass {
       const summary = `${sum || ''} 第 ${i + 1}/${pagelist.length} 个`
       const editFn = async () => {
         if (!this.mwApi) return
-        await this.mwApi.edit(page, function (revision: any) {
-          return {
-            text: revision.content.replace(before, after),
-            summary,
-            minor: true,
-          }
+        await this.editHandler(page, {
+          before,
+          after,
+          summary,
+          minor: true,
         })
         log(`第 ${i + 1}/${pagelist.length} 个编辑已保存: ${page}`)
       }

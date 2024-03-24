@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-07-09 13:51:11
  * @LastEditors: Salt
- * @LastEditTime: 2022-08-04 22:26:54
+ * @LastEditTime: 2024-03-24 20:16:55
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\utils\utils.ts
  */
@@ -77,3 +77,23 @@ export function useConsole(...prefix: any[]) {
 }
 
 export const saltConsole = useConsole(prefix)
+/**
+ * 缩进一段文字
+ * @param text 要缩进的文字
+ * @param config 缩进配置，默认每行前面加两个空格
+ */
+export function indent(
+  text: string,
+  config?: {
+    split?: string
+    count?: number
+    type?: string
+    skipBlank?: boolean
+  }
+) {
+  const { split = '\n', count = 2, type = ' ', skipBlank = true } = config || {}
+  return text
+    .split(split)
+    .map((s) => (skipBlank && !s ? s : type.repeat(count) + s))
+    .join(split)
+}
