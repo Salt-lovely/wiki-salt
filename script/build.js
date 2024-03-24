@@ -1,13 +1,15 @@
 /*
- * @LastEditTime: 2024-03-10 19:20:18
+ * @LastEditTime: 2024-03-23 19:29:38
  * @Description: 打包到 dist
  */
 
-const { banner } = require('./banner')
+// const { banner } = require('./banner')
 
 const commonBuild = {
   props: {
-    banner,
+    minify: true,
+    // banner,
+    outfile: 'build/index.min.js',
   },
   define: {
     __DEV__: 'false',

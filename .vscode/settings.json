@@ -8,6 +8,7 @@
         "formatversion",
         "invalidtitle",
         "nocreate",
+        "outfile",
         "pagelist",
         "pagid",
         "rvprop",
