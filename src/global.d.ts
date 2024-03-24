@@ -2,13 +2,14 @@
  * @Author: Salt
  * @Date: 2022-07-09 13:48:48
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-10 18:30:02
+ * @LastEditTime: 2024-03-24 19:24:05
  * @Description: 全局类型定义
  * @FilePath: \wiki-salt\src\global.d.ts
  */
 /// <reference path="./codeMirror" />
 interface Window {
-  we: any
+  we: SaltWikiEditHelper
+  SaltWikiEditHelper: SaltWikiEditHelper
 }
 declare var mw: MediaWiki
 interface MediaWiki {

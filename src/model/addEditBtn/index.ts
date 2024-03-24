@@ -2,12 +2,13 @@
  * @Author: Salt
  * @Date: 2022-08-04 22:25:14
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-10 16:36:38
+ * @LastEditTime: 2024-03-24 18:05:36
  * @Description: 添加编辑按钮
  * @FilePath: \wiki-salt\src\model\addEditBtn\index.ts
  */
 import WikiConstant from 'src/constant/wiki'
 import vector from './vector'
+import { saltConsole } from 'Utils/utils';
 
 const skinConvertor: { [skin: string]: (skin: string) => unknown } = {
   vector,
@@ -19,4 +20,5 @@ export function addEditBtnInit() {
   //
   const skin = WikiConstant.skin
   ;(skinConvertor[skin] || skinConvertor.vector)(skin)
+  saltConsole.log('添加编辑按钮子模块初始化完成')
 }

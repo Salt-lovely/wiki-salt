@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-08-21 19:35:08
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-09 16:10:28
+ * @LastEditTime: 2024-03-24 18:05:59
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\model\handleDoubleRedirect\index.ts
  */
@@ -10,6 +10,7 @@ import { confirmModal } from 'Components/Modal'
 import WikiConstant from 'src/constant/wiki'
 import { h } from 'salt-lib'
 import { postEdit } from 'Utils/wiki'
+import { saltConsole } from 'Utils/utils'
 /** 双重重定向处理 */
 export function handleDoubleRedirect() {
   const { currentSpecialPageName } = WikiConstant
@@ -67,4 +68,5 @@ export function handleDoubleRedirect() {
     })
     editBtn.parentElement!.insertBefore(fastBtn, editBtn)
   })
+  saltConsole.log('双重重定向快速处理子模块初始化完成')
 }
