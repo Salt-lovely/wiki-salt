@@ -49,6 +49,9 @@ export default class SaltWikiEditHelper extends SaltOriginalClass {
       sum: sum || `添加 “${content}” 到页首`,
     })
   }
+  pageScript(handler: EditHandler, sum?: string) {
+    return this.pageHandle({ handler, sum: sum || '使用脚本处理页面' })
+  }
 
   wikiReplace(
     pages: string | string[] = '',
@@ -102,6 +105,23 @@ export default class SaltWikiEditHelper extends SaltOriginalClass {
       after: content,
       timeInterval,
       sum: `批量添加：添加 “${content}” 到页首`,
+      sync,
+    })
+  }
+  wikiScript(
+    pages: string | string[] = '',
+    handler: EditHandler,
+    timeInterval = 500,
+    sync = false
+  ) {
+    if (typeof pages !== 'string' && !Array.isArray(pages)) {
+      throw new Error('参数pages必须是以“; ”分割的字符串，或一个字符串数组')
+    }
+    this.wikiHandle({
+      pages,
+      handler,
+      timeInterval,
+      sum: `使用脚本批量处理页面`,
       sync,
     })
   }

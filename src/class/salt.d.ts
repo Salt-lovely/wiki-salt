@@ -6,6 +6,15 @@
  * @Description: 这个文件的功能
  * @FilePath: \wiki-salt\src\class\salt.d.ts
  */
+/**
+ * @param text 页面的源码
+ * @param title 页面标题
+ * @returns 需要至少返回一个`{ text: string }`
+ */
+type EditHandler = (
+  text: string,
+  title: string
+) => { text: string; summary?: string; minor: boolean }
 interface defaultEditConfig {
   /** 被替换的内容，可以用正则表达式 */
   before: string | RegExp
@@ -17,32 +26,46 @@ interface defaultEditConfig {
 interface handlerEditConfig extends defaultEditConfig {
   /** 提交编辑时的摘要 */
   summary: string
-  /**
-   * 有`handler`时优先使用（忽略`before`和`after`）
-   * @param text 页面的源码
-   * @param title 页面标题
-   * @returns 需要至少返回一个`{ text: string }`
-   */
-  handler: (
-    text: string,
-    title: string
-  ) => { text: string; summary?: string; minor: boolean }
+  /** 有`handler`时优先使用（忽略`before`和`after`）*/
+  handler: EditHandler
 }
 interface timeInterval {
   /** 替换的时间间隔，推荐 200-300，超过15个时建议 500，超过35个时建议 750，超过50个时建议 1000，超过100个时建议1500 */
   timeInterval?: number
 }
+
 /** pageEdit 替换当前页面内容方法的参数 */
 interface pageEditProps extends defaultEditConfig {
   /** 非必输，如果没有就默认是当前页 */
   pageName?: string
 }
+/** pageHandle 替换当前页面内容方法的参数 */
+interface pageHandlerProps {
+  /** 非必输，如果没有就默认是当前页 */
+  pageName?: string
+  /** 提交编辑时的摘要 */
+  sum?: string
+  /** 有`handler`时优先使用（忽略`before`和`after`）*/
+  handler: EditHandler
+}
+
 /** wikiEdit 批量替换页面内容方法的参数 */
 interface wikiEditProps extends defaultEditConfig, timeInterval {
   /** 页面名集合，用特殊标记（; ）（一个半角分号+一个空格）隔开 */
   pages: string | string[]
   /** 是否在上一条结束后再提交下一个编辑 */
   sync?: boolean
+}
+/** wikiHandle 替换当前页面内容方法的参数 */
+interface wikiHandlerProps extends timeInterval {
+  /** 页面名集合，用特殊标记（; ）（一个半角分号+一个空格）隔开 */
+  pages: string | string[]
+  /** 是否在上一条结束后再提交下一个编辑 */
+  sync?: boolean
+  /** 提交编辑时的摘要 */
+  sum?: string
+  /** 有`handler`时优先使用（忽略`before`和`after`）*/
+  handler: EditHandler
 }
 interface newPageProps {
   content: string
@@ -66,7 +89,7 @@ interface wikiSearchAndReplaceProps extends defaultEditConfig, timeInterval {
 type saltWikiHelpNote = {
   basic: string
   short?: string
-  methods: { name: string; params: saltWikiHelpNoteParam, desc?:string }[]
+  methods: { name: string; params: saltWikiHelpNoteParam; desc?: string }[]
 }
 type saltWikiHelpNoteParam = {
   name: string

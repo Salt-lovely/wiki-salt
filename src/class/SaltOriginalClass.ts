@@ -2,7 +2,7 @@
  * @Author: Salt
  * @Date: 2022-07-09 15:13:33
  * @LastEditors: Salt
- * @LastEditTime: 2024-03-24 20:17:48
+ * @LastEditTime: 2024-03-24 21:16:08
  * @Description: 实现基础功能的类
  * @FilePath: \wiki-salt\src\class\SaltOriginalClass.ts
  */
@@ -110,14 +110,17 @@ export default class SaltOriginalClass {
     if (!this.mwApi) return
     const { before, after, handler, sum, ...otherConfig } = config
     return await this.mwApi.edit(page, function (revision: any) {
-      const res = { text: revision.content, summary: sum }
+      const res = Object.assign(
+        { text: revision.content, summary: sum },
+        otherConfig
+      )
       if (before != null && after != null) {
         res.text = res.text.replace(before, after)
       } else if (typeof handler === 'function') {
         let textRes = handler(res.text, page)
         if (typeof textRes.text === 'string') Object.assign(res, textRes)
       }
-      return Object.assign({}, res, otherConfig)
+      return res
     })
   }
 
@@ -134,6 +137,15 @@ export default class SaltOriginalClass {
       summary: sum,
       minor: true,
     })
+    log('编辑已保存: ' + page)
+  }
+  async pageHandle(props: pageHandlerProps) {
+    const { handler, sum = '', pageName } = props
+    const page: string = pageName || mw.config.get('wgPageName')
+    if (!this.pageNameCheck(page) || !this.mwApi) {
+      return
+    }
+    await this.editHandler(page, { handler })
     log('编辑已保存: ' + page)
   }
 
@@ -165,6 +177,29 @@ export default class SaltOriginalClass {
           summary,
           minor: true,
         })
+        log(`第 ${i + 1}/${pagelist.length} 个编辑已保存: ${page}`)
+      }
+      if (sync) {
+        try {
+          await editFn()
+        } catch (e) {
+          log(`第 ${i + 1}/${pagelist.length} 个页面“${page}”保存失败`)
+        }
+      } else editFn()
+      await sleep(timeInterval)
+    }
+  }
+  async wikiHandle(props: wikiHandlerProps) {
+    const { pages, handler, sum = '', timeInterval = 200, sync = false } = props
+    const pagelist = typeof pages === 'string' ? pages.split('; ') : pages
+    log(`批量编辑 ${pagelist.length} 个页面`)
+    for (let i = 0; i < pagelist.length; i++) {
+      const page = pagelist[i]
+      if (!this.pageNameCheck(page)) continue
+      const summary = `${sum || ''} 第 ${i + 1}/${pagelist.length} 个`
+      const editFn = async () => {
+        if (!this.mwApi) return
+        await this.editHandler(page, { handler, summary })
         log(`第 ${i + 1}/${pagelist.length} 个编辑已保存: ${page}`)
       }
       if (sync) {

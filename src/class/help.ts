@@ -47,6 +47,25 @@ const helpNote: saltWikiHelpNote = {
       ],
     },
     {
+      name: 'wikiScript',
+      params: [
+        {
+          name: 'pages',
+          desc: '页面名集合。可以是一个数组；或是一个长字符串，用特殊标记（; ）（一个半角分号+一个空格）隔开，默认为空',
+        },
+        {
+          name: 'handler',
+          type: '(text: string, title: string) => { test: string, ... }',
+          desc: '一个函数，用于处理页面代码',
+          require: true,
+        },
+        {
+          name: 'timeInterval',
+          desc: '每次替换的时间间隔，单位毫秒，推荐 200-300，超过15个 500，超过35个 750，超过50个 1000，超过100个 1500，默认为 500',
+        },
+      ],
+    },
+    {
       name: 'pageReplace',
       params: [
         {
@@ -68,6 +87,17 @@ const helpNote: saltWikiHelpNote = {
     {
       name: 'pagePrepend',
       params: [{ name: 'content', desc: '要添加到页首的内容' }],
+    },
+    {
+      name: 'pageScript',
+      params: [
+        {
+          name: 'handler',
+          type: '(text: string, title: string) => { test: string, ... }',
+          desc: '一个函数，用于处理页面代码',
+          require: true,
+        },
+      ],
     },
     { name: 'searchMain', desc: '搜索主名字空间', params: [] },
     { name: 'searchUserpage', desc: '搜索用户名字空间', params: [] },
